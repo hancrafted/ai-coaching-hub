@@ -4,34 +4,10 @@
     "frontmatter": {
       "unmatched": "exempt",
       "pathRules": [
-        {
-          "include": [".archgate/adrs/*.md"],
-          "rule": {
-            "allowedTypes": ["adr"],
-            "label": "title"
-          }
-        },
-        {
-          "include": ["README.md"],
-          "rule": {
-            "allowedTypes": ["docs"],
-            "label": "title"
-          }
-        },
-        {
-          "include": ["AGENTS.md"],
-          "rule": {
-            "allowedTypes": ["agents-md"],
-            "label": "title"
-          }
-        },
-        {
-          "include": ["CLAUDE.md"],
-          "rule": {
-            "allowedTypes": ["claude-md"],
-            "label": "title"
-          }
-        }
+        { "include": [".archgate/adrs/*.md"], "rule": { "allowedTypes": ["adr"], "label": "title" } },
+        { "include": ["README.md"], "rule": { "allowedTypes": ["docs"], "label": "title" } },
+        { "include": ["AGENTS.md"], "rule": { "allowedTypes": ["agents-md"], "label": "title" } },
+        { "include": ["CLAUDE.md"], "rule": { "allowedTypes": ["claude-md"], "label": "title" } }
       ]
     }
   }

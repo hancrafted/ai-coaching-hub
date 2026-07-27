@@ -1,3 +1,8 @@
+---
+type: agents-md
+title: AI Coaching Hub Agent Guide
+---
+
 # ai-coaching-hub — Agent Guide
 
 This repo contains publically available coaching content from Han.

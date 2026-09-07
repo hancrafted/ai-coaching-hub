@@ -9,8 +9,6 @@ This is a **single-context** repo.
 - **`CONTEXT.md`** at the repo root — the domain glossary / ubiquitous language.
 - **`docs/design-decision/`** — read the design decisions that touch the area you're about to work in.
 
-> Note: This repo also uses **Archgate**, which governs its own Architecture Decision Records under `.archgate/adrs/`. Those are the authoritative, enforced architectural rules. The `docs/design-decision/` folder here is for the lighter-weight design decisions captured by the `/domain-modeling` skill — keep the two distinct.
-
 If any of these files don't exist, **proceed silently**. Don't flag their absence and don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` or `/improve-codebase-architecture`) creates them lazily, as terms and decisions actually get resolved.
 
 ## File structure

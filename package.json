@@ -9,13 +9,12 @@
     "test:watch": "vitest watch",
     "knip": "knip",
     "prepare": "husky",
-    "verify": "archgate check && eslint . && prettier --check . && tsc --noEmit && vitest run && knip",
-    "verify:commit": "lint-staged && archgate check && tsc --noEmit && vitest run"
+    "verify": "eslint . && prettier --check . && tsc --noEmit && vitest run && knip",
+    "verify:commit": "lint-staged && tsc --noEmit && vitest run"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "archgate": "^0.50.0",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",

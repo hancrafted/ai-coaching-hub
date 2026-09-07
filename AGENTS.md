@@ -39,4 +39,4 @@ Default five-role triage vocabulary: `needs-triage`, `needs-info`, `ready-for-ag
 
 ### Domain docs
 
-**Single-context** repo: `CONTEXT.md` at the root, with design decisions under `docs/design-decision/` (Archgate owns its own ADRs under `.archgate/adrs/`). See `docs/agents/domain.md`.
+**Single-context** repo: `CONTEXT.md` at the root, with design decisions under `docs/design-decision/`. See `docs/agents/domain.md`.

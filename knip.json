@@ -1,6 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["*.ts"],
-  "project": ["*.ts"],
-  "ignoreExportsUsedInFile": true
+  "entry": [".archgate/adrs/*.rules.ts"],
+  "project": ["src/**/*.ts", "*.ts", ".archgate/**/*.ts"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": ["@hancrafted/markdown-harness"]
 }

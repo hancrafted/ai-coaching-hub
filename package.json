@@ -9,8 +9,8 @@
     "test:watch": "vitest watch",
     "knip": "knip",
     "prepare": "husky",
-    "verify": "archgate check && eslint . && prettier --check . && tsc --noEmit && vitest run && knip",
-    "verify:commit": "lint-staged && archgate check && tsc --noEmit && vitest run"
+    "verify": "archgate check && mh --check && eslint . && prettier --check . && tsc --noEmit && vitest run && knip",
+    "verify:commit": "lint-staged && archgate check && mh --check && tsc --noEmit && vitest run"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

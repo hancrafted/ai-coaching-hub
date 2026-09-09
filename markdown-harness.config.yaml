@@ -1,9 +1,16 @@
-# Frontmatter governance for the LLM-wiki knowledge bundle.
+# Frontmatter governance for the LLM-wiki knowledge bundle and what is built
+# from it.
 #
-# Governance is opt-in by path. Only `docs/llm-wiki/content-blocks/` is
-# governed today; the rest of the repository is deliberately invisible to the
-# harness. A file no Rule names is not "passing" — it is ungoverned, and that
-# is a choice made per directory rather than for the whole tree.
+# Two zones, governed for different reasons. `docs/llm-wiki/` is the bundle:
+# three Rules split by provenance, one per kind. `docs/presentations/` sits
+# outside the bundle and holds compositions — what gets assembled out of the
+# corpus and said to a room. The corpus refuses to store pedagogy, so the
+# composition that carries it lives elsewhere and is governed on its own terms.
+#
+# Governance is still opt-in by path. Everything else in the repository is
+# deliberately invisible to the harness. A file no Rule names is not "passing"
+# — it is ungoverned, and that is a choice made per directory rather than for
+# the whole tree.
 #
 # Rules are first-match in written order. Nothing merges and nothing is
 # inherited, so a narrow Rule placed under a broader one silently governs zero
@@ -283,3 +290,107 @@ frontmatter:
                 Verification is mine alone — this content goes out under my name.
                 An agent may draft, but only I can promote a draft to stable, and
                 `verified.by` is the record that I actually read it.
+
+    # Outside the bundle, deliberately. Everything above is corpus; this is what
+    # gets built out of it. The corpus will not store pedagogy — duration,
+    # sequencing, cut order — so the artifact that carries pedagogy needs a
+    # directory of its own, and the moment it carries my name it needs governing
+    # too.
+    - ruleId: presentation
+      path:
+        - docs/presentations/**/*.md
+      excludeFiles:
+        - '**/index.md'
+        - '**/log.md'
+      intent: >-
+        A presentation is a composition: a talk assembled out of corpus
+        documents, carrying the pedagogy the corpus deliberately refuses to
+        store. It is the only thing here an audience ever sees, and it goes out
+        under my name and onto a recording, so it has to name what it was built
+        from and say plainly whether a human has read it. A script that leans on
+        unpromoted drafts and does not admit it is the exact failure this talk
+        is about, performed live.
+      fields:
+        type:
+          presence: required
+          allowed:
+            - value: presentation
+              intent: >-
+                The directory already says this is a presentation; the field
+                repeats it so a document that gets moved is caught rather than
+                silently regoverned by whichever Rule its new home matches.
+        title:
+          presence: required
+        description:
+          presence: required
+          maxLength: 200
+          intent: >-
+            One sentence a retrieval step can rank without opening the file. The
+            cap is there to stop it drifting into an abstract of the whole talk.
+        tags:
+          presence: required
+          minItems: 1
+          intent: >-
+            Topic lives here, never in the directory tree. Directories carry the
+            one dimension a Rule selector can see; tags carry the cross-cutting
+            ones it cannot.
+        sources:
+          presence: required
+          minItems: 1
+          intent: >-
+            Every document this talk was assembled from, listed. The trust model
+            only lets a composition draw on documents that are stable and
+            verified, and that is uncheckable unless the composition names what
+            it drew on. A deck whose provenance is unstated is the thing this
+            particular deck spends three minutes warning the room about.
+        sources[].resource:
+          presence: required
+          format: uri
+          intent: >-
+            Every source followable — a repo-relative path for a corpus
+            document, a URL for anything outside it. An entry with a title and
+            no address is a citation I cannot check in the week before I stand
+            up and repeat it.
+        generated.by:
+          presence: required
+          format: actor
+          intent: >-
+            Whoever drafted this, named as `<producer>/<version>` for a tool or
+            `human:<id>` for a person. It matters more here than anywhere in the
+            corpus: these words end up in my mouth, in a room, on a recording,
+            and I should never be unsure which of them I wrote.
+        generated.at:
+          presence: required
+          format: datetime
+        status:
+          presence: required
+          allowed:
+            - value: draft
+              intent: Drafted, not yet read by me. Must not be delivered.
+            - value: stable
+              intent: I have read it and I stand behind every claim in it.
+            - value: deprecated
+              intent: >-
+                Kept for history — a talk already given, or one I would no
+                longer give.
+          intent: >-
+            Stated outright, because OKF reads an absent `status` as `stable`.
+            The one default that must never happen here is an unread script
+            promoting itself in the week I am due to deliver it.
+        stale_after:
+          presence: required
+          format: datetime
+          intent: >-
+            The instant this stops being deliverable without a re-read. A talk
+            decays faster than anything in the corpus, because it is pinned to a
+            date, an audience, and whatever happened to be true of the tooling
+            that week.
+        # No `presence` key here on purpose — see the note on the first Rule.
+        verified.by:
+          allowed:
+            - value: human:han
+              intent: >-
+                Verification is mine alone — this content goes out under my name
+                and onto a recording. An agent may draft the script, but only I
+                can promote it, and `verified.by` is the record that I read the
+                thing I am about to say out loud.

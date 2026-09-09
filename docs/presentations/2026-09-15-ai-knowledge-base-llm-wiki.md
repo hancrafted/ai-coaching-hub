@@ -1,8 +1,33 @@
+---
+type: presentation
+title: AI knowledge bases and the LLM wiki
+description: Twenty-minute all-hands talk arguing that AI accelerates the rot that has always killed knowledge bases, so governance has to arrive with the knowledge base rather than after it.
+tags: [presentation, all-hands, llm-wiki, knowledge-management, context-engineering, governance, ai-enablement]
+sources:
+  - id: okf-knowledge-bases
+    resource: docs/llm-wiki/references/aikb-knowledge-bases.md
+    title: Knowledge bases in the Open Knowledge Format
+  - id: llm-wiki-block
+    resource: docs/llm-wiki/content-blocks/aikb-llm-wiki.md
+    title: LLM wiki
+  - id: token-economy-talk
+    resource: https://www.youtube.com/watch?v=S0Nx4faEebY
+    title: The AI Token Economy — Why you should treat AI as a Freelancer (recording)
+  - id: token-economy-page
+    resource: https://github.com/hancrafted/coaching-content/blob/main/ai-token-economy-101/index.html
+    title: The AI Token Economy — tower page
+generated: { by: claude-code/opus-5, at: 2026-09-09T16:08:48Z }
+status: draft
+stale_after: 2026-09-16T00:00:00Z
+---
+
 # AI knowledge bases and the LLM wiki
 
 **AI all-hands · Tue 2026-09-15 · 20 minutes**
 
-A script, not a deck. It carries the narrative, the timings, what is on screen, and — for every factual beat — the `reference` document the claim has to trace to. The rendered artifact is [#18](https://github.com/hancrafted/ai-coaching-hub/issues/18); the rendering format does not change anything below.
+A script, not a deck. It carries the narrative, the timings, what is on screen, and — for every factual beat — the source the claim has to trace to. The rendered artifact is [#18](https://github.com/hancrafted/ai-coaching-hub/issues/18); the rendering format does not change anything below.
+
+Governed by the `presentation` Rule in `markdown-harness.config.yaml`, which is why `sources` above is not decoration: it is the manifest of everything this talk is assembled from, and the trust model only lets a composition draw on documents that are `stable` and `verified`. Two of the four are not yet. This file is `status: draft` and unverified until read — see [Open](#open).
 
 ## Core message
 
@@ -10,30 +35,32 @@ A script, not a deck. It carries the narrative, the timings, what is on screen, 
 >
 > And here is the part nobody wants to hear: **a knowledge base you build for AI will rot exactly like every knowledge base before AI did.** It goes stale, people get burned by it, they stop trusting it, and once they stop trusting it they stop maintaining it. That spiral predates AI entirely. AI just runs it faster — at both ends.
 
-Sequel to **The AI Token Economy — Why you should treat AI as a Freelancer**. That talk asked _how much context can you afford_. This one asks _where does it come from, and can you trust it_.
+Sequel to **The AI Token Economy — Why you should treat AI as a Freelancer** [`token-economy-talk`]. That talk asked _how much context can you afford_. This one asks _where does it come from, and can you trust it_.
 
 ## Movements
 
-| #   | movement                                 | min      | on screen                 | rests on                           |
-| --- | ---------------------------------------- | -------- | ------------------------- | ---------------------------------- |
-| 1   | The freelancer who remembers nothing     | 1.5      | previous tower page, live | —                                  |
-| 2   | Context: from "how much" to "where from" | 2.5      | title + one diagram       | —                                  |
-| 3   | An accelerator, not a solution           | 2.0      | thesis slide              | —                                  |
-| 4   | Where context comes from                 | 2.5      | options, one per row      | **new:** context engineering · RAG |
-| 5   | The LLM wiki, as Karpathy proposed it    | 2.5      | quote + the loop          | **new:** Karpathy's proposal       |
-| 6   | **Knowledge bases have always rotted**   | 3.0      | the spiral                | —                                  |
-| 7   | So what would you have to enforce?       | 2.5      | three requirements        | `aikb-knowledge-bases.md` ✅       |
-| 8   | The harness, prepared                    | 3.0      | recorded terminal         | the repo itself                    |
-| 9   | A frontier, not a result                 | 1.5      | close                     | —                                  |
-|     | **total**                                | **21.0** |                           |                                    |
+| #   | movement                                 | min      | on screen                 | rests on                      |
+| --- | ---------------------------------------- | -------- | ------------------------- | ----------------------------- |
+| 1   | The freelancer who remembers nothing     | 1.5      | previous tower page, live | `token-economy-page`          |
+| 2   | Context: from "how much" to "where from" | 2.5      | title + one diagram       | —                             |
+| 3   | An accelerator, not a solution           | 2.0      | thesis slide              | —                             |
+| 4   | Where context comes from                 | 2.5      | options, one per row      | **pending:** [#27], [#29]     |
+| 5   | The LLM wiki, as Karpathy proposed it    | 2.5      | quote + the loop          | **pending:** [#28]            |
+| 6   | **Knowledge bases have always rotted**   | 3.0      | the spiral                | —                             |
+| 7   | So what would you have to enforce?       | 2.5      | three requirements        | `okf-knowledge-bases` (draft) |
+| 8   | The harness, prepared                    | 3.0      | recorded terminal         | the repo itself               |
+| 9   | A frontier, not a result                 | 1.5      | close                     | —                             |
+|     | **total**                                | **21.0** |                           |                               |
 
 One minute over on purpose — see [Cut list](#cut-list).
+
+Three of the nine movements do not yet have a source they can trace to. That is the honest state of the manifest, and it is the same gap `mh --audit` reports about the `story` Rule in movement 8.
 
 ---
 
 ## 1 · The freelancer who remembers nothing — 1.5 min
 
-**On screen:** the token-economy tower page, live in a browser. Two sections: the freelancer characteristics, and the closing "Start building the context." No slide of my own.
+**On screen:** the token-economy tower page [`token-economy-page`], live in a browser. Two sections: the freelancer characteristics, and the closing "Start building the context." No slide of my own.
 
 Last time I described a freelancer who is fast, well-read, tireless, accepts any task, asks no questions, and is eager to bill. And who **remembers nothing**.
 
@@ -75,10 +102,12 @@ Four answers in common use: **stuff it in the prompt**, **retrieve it per questi
 
 RAG is the one worth dwelling on, because it is the default answer and its failure is structural rather than a quality problem: **it re-derives the answer from scratch every time.** Nothing accumulates. No synthesis survives the session that produced it. Ask a related question tomorrow and the work happens again, at full price, with no memory that it was ever done.
 
-**Factual claims — each needs a `reference` document:**
+**Factual claims — no source in the manifest yet:**
 
-- What context engineering is as a discipline, and what techniques it contains → **new reference needed**
-- What RAG is, mechanically, and the compounding limitation → **new reference needed**
+- What context engineering is as a discipline, and what techniques it contains → [#27]
+- What RAG is, mechanically, and the compounding limitation → [#29]
+
+Both must land in `docs/llm-wiki/references/`, be promoted, and be added to `sources` above before this movement is deliverable.
 
 ---
 
@@ -90,11 +119,11 @@ Karpathy's proposal: instead of retrieving fragments per question, have the mode
 
 The difference is **compounding**, not accuracy. Cross-references, contradictions and synthesis are already written down by the time the question arrives.
 
-**Factual claim — needs a `reference` document:**
+**Factual claim — no source in the manifest yet:**
 
-- What Karpathy actually proposed, restated faithfully and cited → **new reference needed**
+- What Karpathy actually proposed, restated faithfully and cited → [#28]
 
-> Kind boundary: Karpathy's proposal restated is a `reference`, because it is his thinking. My argument built on top of it is a `content-block`. `content-blocks/aikb-llm-wiki.md` is the latter and is currently a skeleton.
+> Kind boundary: Karpathy's proposal restated is a `reference`, because it is his thinking. My argument built on top of it is a `content-block`. `llm-wiki-block` is the latter and is currently a skeleton.
 
 ---
 
@@ -132,11 +161,11 @@ Do not start from a tool. Start from the spiral and ask what would have to be tr
 2. **A trust tier** — did a _human_ stand behind this, or did a model write it and nobody check? These are not the same document and they must not look the same.
 3. **An expiry** — when do I stop believing this without re-reading it? Not "is it old", but "has the author's own confidence run out".
 
-Those three are exactly what the **Open Knowledge Format** puts in frontmatter, so this is not my invention — it is an existing specification, and the corpus behind this talk conforms to it.
+Those three are exactly what the **Open Knowledge Format** puts in frontmatter, so this is not my invention — it is an existing specification, and the corpus behind this talk conforms to it [`okf-knowledge-bases`].
 
 The subtle one is expiry. The signal lives **in the file**, where anyone opening it meets it — not in a report someone has to remember to run.
 
-**Factual claims — reference document already exists:** `references/aikb-knowledge-bases.md` (OKF v0.2, sourced and traceable). **Must be promoted to `stable` before Tuesday** — [#26](https://github.com/hancrafted/ai-coaching-hub/issues/26).
+> `okf-knowledge-bases` is still `draft` and unverified. It must be promoted before Tuesday — [#26](https://github.com/hancrafted/ai-coaching-hub/issues/26).
 
 ---
 
@@ -154,6 +183,8 @@ Four beats, in this order. Each is real and reproducible today.
 Then the point that ties it back: **staleness never fails the build.** A document nine months past its expiry produces zero violations. That is deliberate. The harness validates _form_; the freshness signal is for the reader, in the file. A tool that failed the build on an expired document would just teach everyone to bump the date.
 
 > Beat 4 is the strongest and least expected. A governance demo that admits a gap is more credible than one that shows everything green.
+>
+> The optional fifth beat, if it survives rehearsal: this script is governed by the same harness, and it is `status: draft` — the talk cannot claim to be verified until I have read it. Only use it if beat 4 landed and there is time.
 
 ---
 
@@ -181,6 +212,13 @@ Never cut **movement 6**. It is the talk.
 
 ## Open
 
+- **Promotion of this script.** It is `status: draft` with no `verified` block, because promotion is defined as Han's act alone: read it, set `status: stable`, add `verified: { by: human:han, at: <instant> }`. An agent drafting a script and also certifying that a human read it would be the one failure movement 6 exists to warn about — [#26](https://github.com/hancrafted/ai-coaching-hub/issues/26).
+- **Two manifest entries are unpromoted drafts.** `okf-knowledge-bases` and `llm-wiki-block` are both `draft` and unverified, and the trust model does not let a composition lean on them — [#26](https://github.com/hancrafted/ai-coaching-hub/issues/26).
+- **Three `reference` documents missing from the manifest** — [#27], [#29], [#28]. Movements 4 and 5 are not deliverable until they exist, are promoted, and are added to `sources`.
 - **Artifact and recording** — [#18](https://github.com/hancrafted/ai-coaching-hub/issues/18). Marp, tower page, or Astro/Starlight; whether Tuesday's delivery and the YouTube cut are the same artifact.
-- **Three `reference` documents** still to be written, one per factual beat in movements 4 and 5.
-- **Promotion** — [#26](https://github.com/hancrafted/ai-coaching-hub/issues/26). Nothing the deck leans on may be an unpromoted draft.
+
+[#18]: https://github.com/hancrafted/ai-coaching-hub/issues/18
+[#26]: https://github.com/hancrafted/ai-coaching-hub/issues/26
+[#27]: https://github.com/hancrafted/ai-coaching-hub/issues/27
+[#28]: https://github.com/hancrafted/ai-coaching-hub/issues/28
+[#29]: https://github.com/hancrafted/ai-coaching-hub/issues/29

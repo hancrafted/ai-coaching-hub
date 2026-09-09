@@ -88,7 +88,7 @@ Agents draft; humans promote. This inverts the usual arrangement deliberately, b
 
 ## What does not live here
 
-- **Pedagogy** — duration, sequencing, exercise framing. Supplied at generation, not stored. A block hardcoding "20 minutes, module 3" can only be used once.
+- **Pedagogy** — duration, sequencing, exercise framing. Supplied at generation, not stored. A block hardcoding "20 minutes, module 3" can only be used once. Pedagogy lives in `docs/presentations/`, outside this bundle, governed by its own `presentation` Rule: a composition names the corpus documents it was assembled from in `sources`, so the trust model stays checkable across the boundary.
 - **Mirrored third-party material.** This repository is public: cite by URL, quote under fair use inside a `reference`.
 - **A `log.md`.** `git log` is the log.
 - **A hand-written `index.md`.** See `index.md` for why.

@@ -12,11 +12,11 @@ The corpus is English. Output language is a parameter of generation, not a prope
 
 Documents are split by **provenance** — whose knowledge it is — because that determines what a document owes its reader. One directory per kind, because the harness Rule selector matches on paths alone, so per-kind requirements are otherwise inexpressible.
 
-| directory         | `type`          | means                                         | `sources`                                   |
-| ----------------- | --------------- | --------------------------------------------- | ------------------------------------------- |
-| `content-blocks/` | `content-block` | my own synthesis, built on source material    | optional today, intended to become required |
-| `references/`     | `reference`     | someone else's knowledge, faithfully restated | required                                    |
-| `stories/`        | `story`         | my lived experience                           | **forbidden**                               |
+| directory         | `type`          | means                                         | `sources`                                         | `resource`    |
+| ----------------- | --------------- | --------------------------------------------- | ------------------------------------------------- | ------------- |
+| `content-blocks/` | `content-block` | my own synthesis, built on source material    | optional today, intended to become required       | —             |
+| `references/`     | `reference`     | someone else's knowledge, faithfully restated | required, min 1, each entry carrying a `resource` | required      |
+| `stories/`        | `story`         | my lived experience                           | **forbidden**                                     | **forbidden** |
 
 `assets/` holds artifacts owned outright — past decks, transcripts. The harness only walks markdown, so anything binary there is ungoverned.
 
@@ -45,6 +45,8 @@ Required on every governed document: `type`, `title`, `description` (max 200), `
 `verified.by` is **optional in presence but pinned to `human:han`** when present. Optionality is expressed by _omitting_ the `presence` key — writing `presence: optional` parses fine and does nothing, because only `required` and `forbidden` are ever read.
 
 `verified` must use the bare-mapping form `verified: { by, at }`. OKF permits a list, but the address `verified.by` resolves only a mapping.
+
+**On top of the floor, per kind.** A `reference` also requires `resource` — the canonical address of the work being restated — and a `sources` list of at least one entry, each entry carrying its own `resource`. Both halves of that are needed: a per-entry rule says nothing at all when the list itself is absent, so requiring only `sources[].resource` would let an unsourced reference pass.
 
 ## Body structure
 

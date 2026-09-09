@@ -89,3 +89,102 @@ frontmatter:
                 Verification is mine alone — this content goes out under my name.
                 An agent may draft, but only I can promote a draft to stable, and
                 `verified.by` is the record that I actually read it.
+
+    - ruleId: reference
+      path:
+        - docs/llm-wiki/references/**/*.md
+      excludeFiles:
+        - '**/index.md'
+        - '**/log.md'
+      intent: >-
+        A reference is someone else's knowledge restated in my words, so the
+        whole of its worth is that a reader can get back to the original and
+        check me. It has to name what it restates and everything it leans on,
+        because a restatement I cannot trace is indistinguishable from
+        something I made up — and passing that off as research is the one
+        mistake in this corpus I could not walk back.
+      fields:
+        type:
+          presence: required
+          allowed:
+            - value: reference
+              intent: >-
+                The directory already says this is a reference; the field
+                repeats it so a document that gets moved is caught rather than
+                silently regoverned by whichever Rule its new home matches.
+        title:
+          presence: required
+        description:
+          presence: required
+          maxLength: 200
+          intent: >-
+            One sentence a retrieval step can rank without opening the file. The
+            cap is there to stop it drifting into a summary of the whole page.
+        tags:
+          presence: required
+          minItems: 1
+          intent: >-
+            Topic lives here, never in the directory tree. Directories carry the
+            one dimension the Rule selector can see; tags carry the cross-cutting
+            ones it cannot.
+        resource:
+          presence: required
+          format: uri
+          intent: >-
+            The canonical address of the work being restated. A reference stands
+            on one primary work, and without that address the page is a summary
+            of nothing in particular — nobody can hold my restatement against
+            the thing it restates.
+        sources:
+          presence: required
+          minItems: 1
+          intent: >-
+            Everything this page leans on, listed even when the primary work is
+            the only entry. The list is required in its own right because a
+            per-entry rule says nothing at all when the list itself is missing,
+            so this key is what actually makes a reference sourced.
+        sources[].resource:
+          presence: required
+          format: uri
+          intent: >-
+            Every source has to be followable. An entry carrying a title and no
+            address is a citation I cannot check in three months, which is the
+            failure this whole kind exists to prevent.
+        generated.by:
+          presence: required
+          format: actor
+          intent: >-
+            Whoever drafted this, named as `<producer>/<version>` for a tool or
+            `human:<id>` for a person. An unattributed draft is one I cannot
+            judge three months later.
+        generated.at:
+          presence: required
+          format: datetime
+        status:
+          presence: required
+          allowed:
+            - value: draft
+              intent: Drafted, not yet reviewed by me. Not eligible for generation.
+            - value: stable
+              intent: I have read it and I stand behind it.
+            - value: deprecated
+              intent: Kept for history, must not be pulled into new material.
+          intent: >-
+            Stated outright on every document, because OKF reads an absent
+            `status` as `stable` — the one default that would promote an
+            unreviewed draft by saying nothing.
+        stale_after:
+          presence: required
+          format: datetime
+          intent: >-
+            The instant after which I stop trusting this without re-reading it.
+            A restatement decays with the work it restates, so this is the date
+            I go back to the source rather than to my own page.
+        # No `presence` key here on purpose — see the note on the Rule above.
+        verified.by:
+          allowed:
+            - value: human:han
+              intent: >-
+                Verification is mine alone — this content goes out under my name.
+                An agent may draft, but only I can promote a draft to stable, and
+                `verified.by` is the record that I actually read it.

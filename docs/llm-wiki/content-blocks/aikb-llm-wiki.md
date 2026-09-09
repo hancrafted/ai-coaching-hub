@@ -5,7 +5,7 @@ description: A persistent, LLM-maintained wiki that sits between raw sources and
 tags: [llm-wiki, knowledge-management, ai-enablement]
 generated: { by: claude-code/opus-5, at: 2026-09-09T09:22:32Z }
 status: draft
-stale_after: 2026-09-23T09:22:32Z
+stale_after: 2026-09-14T00:00:00Z
 ---
 
 # LLM wiki

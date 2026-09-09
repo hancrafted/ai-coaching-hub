@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@hancrafted/markdown-harness": "^0.0.1",
+    "@hancrafted/markdown-harness": "0.0.4",
     "@vitest/coverage-v8": "^4.1.11",
     "archgate": "^0.55.0",
     "eslint": "^10.10.0",

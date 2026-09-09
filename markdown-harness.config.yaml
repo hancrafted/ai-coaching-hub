@@ -1,0 +1,91 @@
+# Frontmatter governance for the LLM-wiki knowledge bundle.
+#
+# Governance is opt-in by path. Only `docs/llm-wiki/content-blocks/` is
+# governed today; the rest of the repository is deliberately invisible to the
+# harness. A file no Rule names is not "passing" — it is ungoverned, and that
+# is a choice made per directory rather than for the whole tree.
+#
+# Rules are first-match in written order. Nothing merges and nothing is
+# inherited, so a narrow Rule placed under a broader one silently governs zero
+# files. Keep the narrowest Rule first as this file grows.
+
+frontmatter:
+  rules:
+    - ruleId: content-block
+      path:
+        - docs/llm-wiki/content-blocks/**/*.md
+      # `!` negation inside `path` is silently ignored — exclusion only works
+      # through this sibling key. OKF reserves both filenames and forbids
+      # frontmatter in `index.md`, so any Rule asking for `type` would fail on
+      # every one of them.
+      excludeFiles:
+        - '**/index.md'
+        - '**/log.md'
+      intent: >-
+        A content-block is my own synthesis of one scoped topic, written to be
+        pulled into a workshop later without its surroundings. It has to say who
+        drafted it, when, and how long I am willing to stand behind it, because
+        a block that outlives its own correctness is worse than a missing one —
+        I will reuse it in front of a room and never notice it went wrong.
+      fields:
+        type:
+          presence: required
+          allowed:
+            - value: content-block
+              intent: >-
+                The directory already says this is a content-block; the field
+                repeats it so a document that gets moved is caught rather than
+                silently regoverned by whichever Rule its new home matches.
+        title:
+          presence: required
+        description:
+          presence: required
+          maxLength: 200
+          intent: >-
+            One sentence a retrieval step can rank without opening the file. The
+            cap is there to stop it drifting into a summary of the whole block.
+        tags:
+          presence: required
+          minItems: 1
+          intent: >-
+            Topic lives here, never in the directory tree. Directories carry the
+            one dimension the Rule selector can see; tags carry the cross-cutting
+            ones it cannot.
+        generated.by:
+          presence: required
+          format: actor
+          intent: >-
+            Whoever drafted this, named as `<producer>/<version>` for a tool or
+            `human:<id>` for a person. An unattributed draft is one I cannot
+            judge three months later.
+        generated.at:
+          presence: required
+          format: datetime
+        status:
+          presence: required
+          allowed:
+            - value: draft
+              intent: Drafted, not yet reviewed by me. Not eligible for generation.
+            - value: stable
+              intent: I have read it and I stand behind it.
+            - value: deprecated
+              intent: Kept for history, must not be pulled into new material.
+        stale_after:
+          presence: required
+          format: datetime
+          intent: >-
+            The instant after which I stop trusting this without re-reading it.
+            Deliberately short at first and lengthened each time I verify, so a
+            block earns its longer horizon instead of being granted one.
+        # No `presence` key here on purpose. `presence` is only ever read as
+        # `required` or `forbidden`; writing `optional` parses fine and does
+        # nothing, which reads as intent and carries none. Omitting it is what
+        # actually means "optional": nothing but `presence` may speak about a
+        # field that is absent, while `allowed` still binds it when present.
+        verified.by:
+          allowed:
+            - value: human:han
+              intent: >-
+                Verification is mine alone — this content goes out under my name.
+                An agent may draft, but only I can promote a draft to stable, and
+                `verified.by` is the record that I actually read it.

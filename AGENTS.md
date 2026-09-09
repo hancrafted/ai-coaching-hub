@@ -45,6 +45,10 @@ Issues and PRDs are tracked in this repo's **GitHub Issues** via the `gh` CLI. E
 
 Default five-role triage vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
 
+### Grilling rounds
+
+Every grilling round — `/grill-me`, `/grill-with-docs`, or the grilling Wayfinder runs while charting a map or resolving a `wayfinder:grilling` ticket — uses this repo's round format, which overrides the grilling skill's own. See `docs/agents/grilling-format.md`.
+
 ### Domain docs
 
 **Single-context** repo: `CONTEXT.md` at the root, with design decisions under `docs/design-decision/`. See `docs/agents/domain.md`.

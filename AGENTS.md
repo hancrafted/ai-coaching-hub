@@ -7,27 +7,6 @@ title: AI Coaching Hub Agent Guide
 
 This repo contains publically available coaching content from Han.
 
-## Rules
-
-1. Do not auto-include yourself in the commit message.
-
-## Commits
-
-1. **Commits** Make atomic commits using Conventional Commits v1.1.0 format `[feat, fix, docs, refactor, chore](scope): <short summary in present tense>`
-2. **Commit Body** Use the optional commit body to explain the why and how of the change (not the what)by using the Keep a Changelog v1.1.0 categories (Added, Changed, Deprecated, Removed, Fixed, Security) to clearly group the impacts.
-3. **Commit Scope** Keep changes scoped to the domain you are working on.
-4. **Commit Trail** Use `Source: [URL to Github Issue] | [Prompt causing commit]` at the end of commit body, to make tracing back easy.
-5. **Commit Identity** The repo's configured git identity is already correct — commit without overriding `user.name` / `user.email` or passing `--author`. This is a public, personal repo, so the work email carried in the global agent context is not this repo's identity.
-
-Example
-
-```
-doc(README): align root README.md with the agent skills documentation
-
-## Changed
-- Update `README.md` to align with the agent skills documentation.
-```
-
 ## Branches
 
 1. **Map branch** An epic gets one integration branch, `map/<issue>-<slug>` (e.g. `map/10-llm-wiki`), cut from `origin/main`. It opens a single PR to `main` once the epic completes, so `main` sees the epic as one reviewable unit instead of a trickle of ticket commits.

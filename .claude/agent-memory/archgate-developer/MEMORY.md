@@ -1,8 +1,0 @@
-- [Commit trailer preference](feedback_commit_trailer.md) — never add Co-Authored-By: Claude to commits in this repo
-- [Repo setup history](project_repo_setup.md) — ai-coaching-hub GitHub repo + git identity created 2026-07-27
-- [Design philosophy](feedback_design_philosophy.md) — form follows function; open to opinionated frameworks (Starlight) if fast + high quality
-- [Branching workflow](feedback_branching_workflow.md) — never commit to main; map branch + per-ticket sub-branches merging via PR
-- [Off-repo governance](feedback_offrepo_governance.md) — Copilot/SharePoint/OneDrive deliverables get no repo governance; plain copy-paste
-- [Copilot workshop 2026-07-28](project_copilot_workshop.md) — port grill-with-docs to a single Copilot agent + OneDrive/SharePoint folders
-- [LLM-wiki deadlines](project_llm_wiki_deadlines.md) — workshop 2026-09-10, presentation 2026-09-15; scoped throwaway-acceptable
-- [Tracker dependency edges](reference_tracker_dependency_edges.md) — GitHub dependency/sub-issue writes silently no-op; read them back

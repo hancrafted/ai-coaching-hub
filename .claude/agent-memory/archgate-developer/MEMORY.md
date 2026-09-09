@@ -1,3 +1,0 @@
-- [Commit trailer preference](feedback_commit_trailer.md) — never add Co-Authored-By: Claude to commits in this repo
-- [Repo setup history](project_repo_setup.md) — ai-coaching-hub GitHub repo + git identity created 2026-07-27
-- [Design philosophy](feedback_design_philosophy.md) — form follows function; open to opinionated frameworks (Starlight) if fast + high quality

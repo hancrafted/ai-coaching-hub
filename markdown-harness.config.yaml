@@ -188,3 +188,98 @@ frontmatter:
                 Verification is mine alone — this content goes out under my name.
                 An agent may draft, but only I can promote a draft to stable, and
                 `verified.by` is the record that I actually read it.
+
+    - ruleId: story
+      path:
+        - docs/llm-wiki/stories/**/*.md
+      excludeFiles:
+        - '**/index.md'
+        - '**/log.md'
+      intent: >-
+        A story is something I was in the room for, and its whole worth is that
+        it happened to me — there is nothing to check it against but my word,
+        which is exactly why it persuades. So it must not reach for anything
+        else. A story wearing citations is the one failure in this corpus I
+        could not talk my way out of: dressing experience up as research, in
+        front of a room, under my own name.
+      fields:
+        type:
+          presence: required
+          allowed:
+            - value: story
+              intent: >-
+                The directory already says this is a story; the field repeats it
+                so a document that gets moved is caught rather than silently
+                regoverned by whichever Rule its new home matches.
+        title:
+          presence: required
+        description:
+          presence: required
+          maxLength: 200
+          intent: >-
+            One sentence a retrieval step can rank without opening the file. The
+            cap is there to stop it drifting into a retelling of the whole story.
+        tags:
+          presence: required
+          minItems: 1
+          intent: >-
+            Topic lives here, never in the directory tree. Directories carry the
+            one dimension the Rule selector can see; tags carry the cross-cutting
+            ones it cannot.
+        # The two forbidden keys are the whole point of this kind, and they are
+        # forbidden rather than merely unrequired: an absent field says nothing,
+        # while a rejected one says the corpus will not let this happen.
+        sources:
+          presence: forbidden
+          intent: >-
+            A story has no sources, because I am the source. If I find myself
+            wanting to cite something here, what I am actually writing is a
+            content-block that leans on my experience — and it belongs in that
+            directory, under a Rule that will hold me to naming what it leans on.
+        resource:
+          presence: forbidden
+          intent: >-
+            There is no canonical work behind a story to point at. A `resource`
+            here would name something a reader could go and read instead, and
+            the moment that exists this stopped being lived experience.
+        generated.by:
+          presence: required
+          format: actor
+          intent: >-
+            Whoever drafted this, named as `<producer>/<version>` for a tool or
+            `human:<id>` for a person. An unattributed draft is one I cannot
+            judge three months later. On a story it records who wrote the prose,
+            never whose experience it is — that is mine by the kind itself.
+        generated.at:
+          presence: required
+          format: datetime
+        status:
+          presence: required
+          allowed:
+            - value: draft
+              intent: Drafted, not yet reviewed by me. Not eligible for generation.
+            - value: stable
+              intent: I have read it and I stand behind it.
+            - value: deprecated
+              intent: Kept for history, must not be pulled into new material.
+          intent: >-
+            Stated outright on every document, because OKF reads an absent
+            `status` as `stable` — the one default that would promote an
+            unreviewed draft by saying nothing.
+        stale_after:
+          presence: required
+          format: datetime
+          intent: >-
+            What happened does not decay, but the telling does. This is the date
+            I re-read it and ask whether the lesson still holds and whether I
+            would still tell it this way, because an anecdote that has quietly
+            stopped being true of my current practice is worse in a room than no
+            anecdote at all.
+        # No `presence` key here on purpose — see the note on the first Rule.
+        verified.by:
+          allowed:
+            - value: human:han
+              intent: >-
+                Verification is mine alone — this content goes out under my name.
+                An agent may draft, but only I can promote a draft to stable, and
+                `verified.by` is the record that I actually read it.

@@ -1,0 +1,67 @@
+---
+// One beat of the scroll tower. Carries the same data attributes the harvest
+// used, because the engine still reads `data-section` / `data-beat` off the DOM.
+import type { BeatMeta } from './beats';
+interface Props {
+  beat: BeatMeta;
+  sectionTitle: string;
+  /** Beats with their own full-bleed layout opt out of the default measure. */
+  wide?: boolean;
+}
+const { beat, sectionTitle, wide = false } = Astro.props;
+---
+
+<section
+  class="beat"
+  id={beat.id}
+  data-section={beat.section}
+  data-section-title={sectionTitle}
+  data-beat={beat.code}
+  data-assertion={beat.assertion}
+  aria-label={`${beat.code} — ${sectionTitle}`}
+>
+  <div class="beat-inner" data-wide={wide ? '' : undefined}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .beat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    scroll-margin-top: 0;
+    padding: 6rem clamp(1.25rem, 5vw, 6rem);
+  }
+  .beat-inner {
+    width: 100%;
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+  .beat-inner[data-wide] {
+    max-width: 78rem;
+  }
+
+  /* Reveal-on-enter is PROGRESSIVE here. The harvest shipped `opacity-0` in the
+     markup, so with JS off the entire page was blank. The engine adds
+     `is-js` to #tower, and only then do un-revealed beats start hidden. */
+  :global(#tower.is-js) .beat-inner {
+    opacity: 0;
+    translate: 0 1.5rem;
+    transition:
+      opacity 600ms ease-out,
+      translate 600ms ease-out;
+  }
+  :global(#tower.is-js) .beat-inner.is-revealed {
+    opacity: 1;
+    translate: 0 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(#tower.is-js) .beat-inner {
+      transition: none;
+    }
+  }
+</style>

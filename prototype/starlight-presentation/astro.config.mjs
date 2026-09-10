@@ -1,5 +1,7 @@
-// THROWAWAY PROTOTYPE — three variants of one talk page, switchable via `?variant=`
-// on the single `/` route. See ./README.md for the question this answers.
+// THROWAWAY PROTOTYPE 2 — one hub + two learning modules, rendered twice: once
+// on Starlight (`/`, `/talk`, `/token-101`) and once on plain Astro (`/bare/*`),
+// sharing one kit. Answers "do we stick with Astro + Starlight?".
+// See ./README.md and the /findings route.
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 
@@ -19,7 +21,16 @@ export default defineConfig({
         'Throwaway prototype: three ways to render the 2026-09-15 all-hands talk as a page.',
       // Pagefind indexes the built output; harmless here and proves search works.
       pagefind: true,
-      customCss: ['./src/styles/prototype.css'],
+      // Order matters: tokens.css declares the kit contract with literal
+      // values, then tokens-starlight.css re-points it at --sl-*. Both are
+      // unlayered, so source order is what makes the adapter win. Asserted
+      // in the build check, not assumed.
+      customCss: [
+        './src/kit/tokens.css',
+        './src/kit/tokens-starlight.css',
+        './src/styles/chrome.css',
+        './src/styles/starlight-only.css',
+      ],
       sidebar: [
         { label: 'Prototype — 3 variants', link: '/' },
         {

@@ -1,0 +1,161 @@
+---
+// THE BARE TREE'S SHELL — the measured cost of not having Starlight.
+//
+// Everything here is something Starlight supplied for free on the other tree:
+// the document skeleton, <head> metadata, the skip link, the theme toggle AND
+// its FOUC guard, and the footer. This file's line count is a finding.
+//
+// It must never import from @astrojs/starlight, or the experiment is void.
+import '../kit/tokens.css';
+import '../kit/animation.css';
+// Shared prototype chrome (banner, switcher, chips, verdict badges). On the
+// Starlight tree this arrives via `customCss`; the bare tree must ask for it.
+import '../styles/chrome.css';
+import StackBar from '../components/StackBar.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  route: string;
+  /** Towers own the page scroller; documents don't. */
+  fullBleed?: boolean;
+}
+const { title, description, route, fullBleed = false } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    {/* FOUC guard. Starlight ships this; the bare tree must hand-roll it, and it
+        MUST be inline and blocking or the page flashes the wrong theme. */}
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('k-theme');
+          if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          /* storage unavailable — default stands */
+        }
+      })();
+    </script>
+  </head>
+  <body data-full-bleed={fullBleed ? '' : undefined}>
+    <a href="#main" class="skip">Skip to content</a>
+    <StackBar route={route} stack="bare" />
+    <header class="barehead">
+      <a href={`${base}/bare/`} class="barehead__home">Coaching hub</a>
+      <button type="button" id="theme-toggle" class="barehead__theme" aria-label="Toggle theme">
+        ◐
+      </button>
+    </header>
+    <div id="main">
+      <slot />
+    </div>
+    <footer class="barefoot">
+      <p>
+        <strong>plain Astro tree</strong> — no Starlight. No search, no code highlighting, no
+        <code>:::note</code> directives, no i18n routing.
+      </p>
+      <p><a href={`${base}/findings`}>See the scorecard →</a></p>
+    </footer>
+
+    <script>
+      // Theme toggle. Starlight's <ThemeSelect> does this, persists it, and
+      // syncs multiple instances; here it is 10 hand-written lines.
+      const btn = document.getElementById('theme-toggle');
+      btn?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('k-theme', next);
+        } catch {
+          /* non-fatal */
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  :global(html) {
+    color-scheme: dark;
+  }
+  :global(html[data-theme='light']) {
+    color-scheme: light;
+  }
+  :global(body) {
+    margin: 0;
+    background: var(--k-bg);
+    color: var(--k-fg);
+    font-family: var(--k-font);
+    font-size: var(--k-text-base);
+    line-height: var(--k-line);
+  }
+  :global(body:not([data-full-bleed]) #main) {
+    max-width: var(--k-measure);
+    margin-inline: auto;
+    padding: 2rem clamp(1rem, 4vw, 2rem);
+  }
+  :global(h1, h2, h3, h4) {
+    line-height: var(--k-line-tight);
+  }
+  :global(a) {
+    color: var(--k-accent-high);
+  }
+  :global(code) {
+    font-family: var(--k-font-mono);
+    font-size: 0.9em;
+  }
+  .skip {
+    position: absolute;
+    inset-inline-start: -9999px;
+  }
+  .skip:focus {
+    inset-inline-start: 0.5rem;
+    inset-block-start: 0.5rem;
+    z-index: 100;
+    background: var(--k-accent);
+    color: var(--k-bg);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--k-radius-sm);
+  }
+  .barehead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem clamp(0.75rem, 3vw, 1.5rem);
+    border-block-end: 1px solid var(--k-border);
+  }
+  .barehead__home {
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--k-fg);
+  }
+  .barehead__theme {
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-pill);
+    background: none;
+    color: var(--k-fg-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.6rem;
+    font-size: var(--k-text-sm);
+  }
+  .barefoot {
+    border-block-start: 1px solid var(--k-border);
+    margin-block-start: 3rem;
+    padding: 1.5rem clamp(0.75rem, 3vw, 1.5rem);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
+  }
+  .barefoot p {
+    margin: 0.25rem 0;
+  }
+</style>

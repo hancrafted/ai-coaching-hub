@@ -1,0 +1,141 @@
+---
+// S2.1 — the freelancer's three strengths and three flaws, revealed in sequence.
+// This is the one beat whose CSS ported UNTOUCHED (kit/animation.css): its
+// decoration is all `currentColor` / `color-mix`, so dropping daisyUI cost
+// nothing here. Class names are the harvest's, so that CSS still binds.
+import BeatHeader from '../primitives/BeatHeader.astro';
+
+interface Trait {
+  kind: 'strength' | 'flaw';
+  title: string;
+  body: string;
+  frame: string;
+  motif: string;
+  icon: string;
+}
+const TRAITS: Trait[] = [
+  { kind: 'strength', title: 'Fast & well-read', body: 'Knows about everything you ask them, and can produce results fast without needing a break.', frame: 's21-frame--comet', motif: 's21-motif--zip', icon: 'M13 2 3 14h7l-1 8 11-12h-7z' },
+  { kind: 'strength', title: 'Accepts any task', body: "No task too big or too niche — it'll take a swing at whatever you hand it.", frame: 's21-frame--draw', motif: 's21-motif--check', icon: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z' },
+  { kind: 'strength', title: 'Tireless', body: 'Never stops, never sleeps, unless you stop paying.', frame: 's21-frame--march', motif: 's21-motif--loop', icon: 'M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z' },
+  { kind: 'flaw', title: 'No questions.', body: 'Assumes the gaps, fills them with whatever comes to mind.', frame: 's21-frame--gap', motif: 's21-motif--noq', icon: 'M11 18h2v-2h-2v2zm1-16A10 10 0 1 0 12 22 10 10 0 0 0 12 2zm1 13h-2c0-3 3-3 3-6a2 2 0 1 0-4 0H9a4 4 0 1 1 8 0c0 3-4 3-4 6z' },
+  { kind: 'flaw', title: 'Eager to please/bill.', body: 'It bills you for every word you say and every word it says back.', frame: 's21-frame--ching', motif: 's21-motif--check', icon: 'M11.8 10.9c-2.3-.6-3-1.2-3-2.1 0-1 1-1.8 2.5-1.8 1.7 0 2.3.8 2.4 2h2.1c0-1.7-1.1-3.2-3.1-3.7V3h-2.8v2.3c-1.9.4-3.4 1.6-3.4 3.5 0 2.3 1.9 3.4 4.6 4.1 2.5.6 3 1.5 3 2.4 0 .7-.5 1.8-2.5 1.8-1.9 0-2.6-.8-2.7-2H5.8c.1 2.1 1.7 3.3 3.6 3.7V21h2.8v-2.3c1.9-.4 3.5-1.5 3.5-3.5 0-2.8-2.4-3.7-4.9-4.3z' },
+  { kind: 'flaw', title: 'It remembers nothing.', body: "Every new conversation starts from zero. Yesterday's work never happened.", frame: 's21-frame--wipe', motif: 's21-motif--mem', icon: 'M15 16h-3v-6h3l-4-5-4 5h3v6H7l4 5z' },
+];
+---
+
+<div class="s21">
+  <BeatHeader code="S2.1" section="Motivation">
+    <h2 class="s21__h">
+      Thought experiment: Imagine you're assigned a freelancer with these
+      <em>weird characteristics</em>.
+    </h2>
+  </BeatHeader>
+
+  <div class="s21__grid">
+    {
+      TRAITS.map((t) => (
+        <div data-reveal class="s21-card" data-kind={t.kind}>
+          <span class="s21__tag">{t.kind === 'strength' ? 'strength (?)' : 'flaw'}</span>
+          <h4 class="s21__title">{t.title}</h4>
+          <p class="s21__body">{t.body}</p>
+          <span aria-hidden="true" class={`s21-frame ${t.frame}`}></span>
+          <span aria-hidden="true" class={`s21-motif ${t.motif}`}>
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d={t.icon} />
+            </svg>
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .s21__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    max-width: 44ch;
+  }
+  .s21__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s21__grid {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+  .s21-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--k-radius);
+    padding: 1.25rem;
+    /* `color` drives the ported animation.css, which is all currentColor. */
+    border: 1px solid color-mix(in oklab, currentcolor 30%, transparent);
+    background: color-mix(in oklab, currentcolor 5%, transparent);
+  }
+  .s21-card[data-kind='strength'] {
+    color: var(--k-solved);
+  }
+  .s21-card[data-kind='flaw'] {
+    color: var(--k-amplified);
+  }
+  .s21__tag {
+    width: fit-content;
+    border-radius: var(--k-radius-sm);
+    background: color-mix(in oklab, currentcolor 10%, transparent);
+    padding: 0.25rem 0.5rem;
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .s21__title {
+    font-size: var(--k-text-lg);
+    font-weight: 600;
+    margin: 0;
+    color: var(--k-fg);
+  }
+  .s21__body {
+    font-size: var(--k-text-sm);
+    line-height: 1.6;
+    color: var(--k-fg-muted);
+    margin: 0;
+  }
+  /* Sequenced reveal — the engine removes .is-hidden with a stagger. */
+  .s21-card[data-reveal] {
+    opacity: 0;
+    translate: 0 0.75rem;
+    transition:
+      opacity 500ms ease-out,
+      translate 500ms ease-out;
+  }
+  .s21-card[data-reveal].is-shown {
+    opacity: 1;
+    translate: 0 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s21-card[data-reveal] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  // Ported from presentation.js: staggered 160ms + i*260ms.
+  registerActivate('s2-1', (reduced) => {
+    const cards = document.querySelectorAll('#s2-1 [data-reveal]');
+    cards.forEach((el, i) => {
+      const show = () => el.classList.add('is-shown');
+      if (reduced) show();
+      else window.setTimeout(show, 160 + i * 260);
+    });
+  });
+</script>

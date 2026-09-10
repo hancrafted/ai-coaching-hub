@@ -1,0 +1,116 @@
+---
+// The hub's content, shared by both stack shells.
+//
+// Modelled on coaching-content/index.html (213 lines): a slim identity header
+// with NO nav, a typographic hero, the decorative ambient "unwatched tokens"
+// meter, one featured row, then two coming-soon placeholders — deliberately a
+// single editorial column, not a card grid.
+import ModuleCard from '../kit/primitives/ModuleCard.astro';
+import TokenMeter from '../kit/primitives/TokenMeter.astro';
+import StackBar from './StackBar.astro';
+import { COMING_SOON, TALK_MODULE, TOKEN_101_MODULE } from '../modules';
+
+interface Props {
+  stack: 'starlight' | 'bare';
+}
+const { stack } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const prefix = stack === 'bare' ? `${base}/bare` : base;
+---
+
+{stack === 'starlight' && <StackBar route="" stack="starlight" />}
+
+<div class="hub">
+  <header class="hub__id">
+    <p class="hub__eyebrow">Han · coaching content</p>
+    <h1 class="hub__title">
+      Learn to work with AI <em>economically.</em>
+    </h1>
+    <p class="hub__lede">
+      Talks and workshops on the part nobody briefed you on: AI gives you and your team leverage,
+      and quietly hands you a budget to manage.
+    </p>
+    <div class="hub__meter">
+      <TokenMeter label="tokens billed · unwatched · since you arrived" size="sm" />
+    </div>
+  </header>
+
+  <section class="hub__list" aria-label="Modules">
+    <p class="hub__section">Available now</p>
+    <ModuleCard module={TOKEN_101_MODULE} href={`${prefix}/token-101`} featured />
+    <ModuleCard module={TALK_MODULE} href={`${prefix}/talk`} />
+
+    <p class="hub__section hub__section--soon">In the pipeline</p>
+    {COMING_SOON.map((m) => <ModuleCard module={m} />)}
+  </section>
+
+  <footer class="hub__foot">
+    <p>
+      This is a <strong>throwaway prototype</strong>. The same content is rendered twice — once on
+      Starlight, once on plain Astro — to decide whether to keep the stack.
+    </p>
+    <p><a href={`${base}/findings`}>Read the scorecard →</a></p>
+  </footer>
+</div>
+
+<style>
+  .hub {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+  }
+  .hub__eyebrow {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--k-fg-subtle);
+    margin: 0;
+  }
+  .hub__title {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 1rem 0 0;
+  }
+  .hub__title em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .hub__lede {
+    margin-block-start: 1.5rem;
+    font-size: var(--k-text-lg);
+    line-height: 1.65;
+    color: var(--k-fg-muted);
+    max-width: 52ch;
+  }
+  .hub__meter {
+    margin-block-start: 2rem;
+    opacity: 0.6;
+  }
+  .hub__list {
+    margin-block-start: 4rem;
+  }
+  .hub__section {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--k-fg-subtle);
+    margin: 0 0 0.5rem;
+  }
+  .hub__section--soon {
+    margin-block-start: 3rem;
+  }
+  .hub__foot {
+    margin-block-start: 4rem;
+    border-block-start: 1px solid var(--k-border);
+    padding-block-start: 1.5rem;
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
+  }
+  .hub__foot p {
+    margin: 0.35rem 0;
+  }
+</style>

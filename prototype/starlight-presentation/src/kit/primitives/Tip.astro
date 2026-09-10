@@ -1,0 +1,50 @@
+---
+// Absorbs daisyUI `tooltip` ×42. CSS-only so it works identically on both
+// trees with no JS; `data-tip` carries the text.
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+---
+
+<span class="k-tip" data-tip={text} tabindex="0"><slot /></span>
+
+<style>
+  .k-tip {
+    position: relative;
+    border-block-end: 1px dotted var(--k-fg-subtle);
+    cursor: help;
+  }
+  .k-tip::after {
+    content: attr(data-tip);
+    position: absolute;
+    inset-block-end: calc(100% + 0.4rem);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    z-index: 30;
+    width: max-content;
+    max-width: 22ch;
+    padding: 0.35rem 0.55rem;
+    border-radius: var(--k-radius-sm);
+    background: var(--k-fg);
+    color: var(--k-bg);
+    font-size: var(--k-text-xs);
+    font-weight: 500;
+    line-height: 1.35;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: normal;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms;
+  }
+  .k-tip:hover::after,
+  .k-tip:focus-visible::after {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .k-tip::after {
+      transition: none;
+    }
+  }
+</style>

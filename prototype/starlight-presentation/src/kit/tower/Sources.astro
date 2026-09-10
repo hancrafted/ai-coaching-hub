@@ -1,0 +1,77 @@
+---
+// Deliberately NOT a .beat, exactly as in the harvest — it stays out of the TOC
+// and out of the keyboard sequence.
+import { TOKEN_101_SOURCES } from './sources';
+---
+
+<section id="sources" class="srcs">
+  <div class="srcs__inner">
+    <p class="srcs__label">Sources &amp; further reading</p>
+    <p class="srcs__note">The claims on this page, receipted. Prices verified July 2026.</p>
+    <ol class="srcs__list">
+      {
+        TOKEN_101_SOURCES.map((s) => (
+          <li>
+            <span class="srcs__n">[{s.id}]</span>
+            <a href={s.resource} target="_blank" rel="noopener noreferrer">{s.title}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .srcs {
+    border-block-start: 1px solid var(--k-border);
+    background: color-mix(in oklab, var(--k-surface) 20%, transparent);
+    padding: 4rem clamp(1.25rem, 5vw, 6rem);
+  }
+  .srcs__inner {
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+  .srcs__label {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: color-mix(in oklab, var(--k-accent-high) 80%, transparent);
+    margin: 0;
+  }
+  .srcs__note {
+    margin: 0.5rem 0 0;
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
+  }
+  .srcs__list {
+    display: grid;
+    gap: 0.5rem 2rem;
+    margin-block-start: 1.5rem;
+    padding: 0;
+    list-style: none;
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
+  }
+  @media (min-width: 48rem) {
+    .srcs__list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .srcs__list li {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .srcs__n {
+    flex-shrink: 0;
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .srcs__list a {
+    color: inherit;
+  }
+  .srcs__list a:hover {
+    color: var(--k-accent-high);
+  }
+</style>

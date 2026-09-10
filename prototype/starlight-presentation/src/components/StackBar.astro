@@ -1,0 +1,74 @@
+---
+// PROTOTYPE 2 CHROME — the stack switcher. This is the experiment's axis:
+// the same kit content rendered on Starlight (`/talk`) vs plain Astro
+// (`/bare/talk`). A route prefix, not a query param, so module 1's existing
+// `?variant=A|B|C` switcher keeps working untouched — two bars coexist, stack
+// on top and variant at the bottom.
+//
+// NOT part of the kit: this is page structure, and UI.md's guard rail says the
+// kit owns leaf primitives only.
+interface Props {
+  /** Route without a stack prefix, e.g. `talk` or `''` for the hub. */
+  route: string;
+  stack: 'starlight' | 'bare';
+}
+const { route, stack } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const href = (s: 'starlight' | 'bare') =>
+  s === 'starlight' ? `${base}/${route}` : `${base}/bare/${route}`;
+---
+
+<div class="stackbar">
+  <span class="stackbar__label">stack</span>
+  <a href={href('starlight')} aria-current={stack === 'starlight' ? 'page' : undefined}>
+    Starlight
+  </a>
+  <a href={href('bare')} aria-current={stack === 'bare' ? 'page' : undefined}>plain Astro</a>
+  <span class="stackbar__sep" aria-hidden="true">·</span>
+  <a href={`${base}/findings`} class="stackbar__findings">findings →</a>
+</div>
+
+<style>
+  .stackbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem clamp(0.75rem, 3vw, 1.5rem);
+    background: var(--k-bg);
+    border-block-end: 1px dashed var(--k-warn);
+    font-size: var(--k-text-xs);
+  }
+  .stackbar__label {
+    font-family: var(--k-font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+  }
+  .stackbar a {
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--k-radius-pill);
+    border: 1px solid var(--k-border);
+    color: var(--k-fg-muted);
+    text-decoration: none;
+  }
+  .stackbar a[aria-current='page'] {
+    border-color: var(--k-warn);
+    background: var(--k-warn-low);
+    color: var(--k-warn-high);
+    font-weight: 700;
+  }
+  .stackbar a:hover {
+    border-color: var(--k-accent);
+    color: var(--k-accent-high);
+  }
+  .stackbar__sep {
+    color: var(--k-fg-faint);
+  }
+  .stackbar__findings {
+    margin-inline-start: auto;
+    border-style: dashed !important;
+  }
+</style>

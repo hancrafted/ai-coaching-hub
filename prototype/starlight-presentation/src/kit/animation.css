@@ -1,0 +1,513 @@
+/* Ported AS-IS from coaching-content/ai-token-economy-101/animation.css.
+ * Scoped entirely to beat S2.1. Colour is all currentColor / color-mix, so it
+ * is theme-agnostic and needed no rewrite when daisyUI was dropped — the only
+ * part of the harvest's CSS that survived untouched. Recorded on /findings.
+ */
+/* =============================================================================
+   S2.1 · Motivation — card hover animations
+   -----------------------------------------------------------------------------
+   FE-001 permits custom CSS "for complex animations." Keyframes live here (a
+   dedicated stylesheet), never in a <style> block or inline style= attribute in
+   index.html. Colors resolve from `currentColor`, which each element inherits
+   from a Tailwind `text-success` / `text-error` utility, so everything stays
+   theme-aware. All motion is disabled under prefers-reduced-motion (bottom).
+
+   Structure of each card in the markup:
+     .s21-card (relative, overflow-hidden)
+       .s21-frame.s21-frame--<pattern>   → animated border overlay (inset-0)
+       .s21-motif.s21-motif--<name>      → corner glyph that flies in on hover
+       [optional content-emphasis hooks: .s21-shimmer, .s21-fade]
+============================================================================= */
+
+/* Custom properties animated by the "ring" borders (comet / draw / wipe). */
+@property --s21-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --s21-fill {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+/* -----------------------------------------------------------------------------
+   Corner motif — shared base. Sits just inside the top-right corner and is
+   hidden until the card is hovered. overflow-hidden on .s21-card clips it as it
+   flies in from / out to the corner.
+----------------------------------------------------------------------------- */
+.s21-motif {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Fly in from the top-right, hold, fly back out — the default motif motion. */
+@keyframes s21-fly {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(55%, -55%) scale(0.5);
+  }
+  16%,
+  72% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Border frame — shared base. Full-bleed overlay that follows the card's
+   rounded corners. Individual patterns add their own paint + motion below.
+----------------------------------------------------------------------------- */
+.s21-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+.s21-card:hover .s21-frame {
+  opacity: 1;
+}
+
+/* "Ring" patterns paint a conic gradient and mask out the interior so only a
+   2px border ring shows. Shared by comet / draw / wipe. */
+.s21-frame--comet,
+.s21-frame--draw,
+.s21-frame--wipe {
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* =========================================================================
+   CARD 1 — Fast & well-read (success)
+   Motif: a lightning bolt zips in and out, fast.
+   Content: a diagonal light "scan" sweeps across the whole card.
+   Border: a bright comet races around the perimeter.
+========================================================================= */
+.s21-card:hover .s21-motif--zip {
+  animation: s21-fly 1.1s ease-in-out infinite;
+}
+
+.s21-shimmer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+}
+.s21-shimmer::before {
+  content: "";
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    color-mix(in oklab, currentColor 22%, transparent),
+    transparent
+  );
+  transform: translateX(-180%) skewX(-18deg);
+}
+.s21-card:hover .s21-shimmer {
+  opacity: 1;
+}
+.s21-card:hover .s21-shimmer::before {
+  animation: s21-shimmer 1.1s ease-in-out infinite;
+}
+@keyframes s21-shimmer {
+  0% {
+    transform: translateX(-180%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+.s21-frame--comet {
+  background: conic-gradient(
+    from var(--s21-angle),
+    transparent 0 68%,
+    color-mix(in oklab, currentColor 40%, transparent) 80%,
+    currentColor 88%,
+    transparent 96% 100%
+  );
+}
+.s21-card:hover .s21-frame--comet {
+  animation: s21-spin 1.3s linear infinite;
+}
+@keyframes s21-spin {
+  to {
+    --s21-angle: 360deg;
+  }
+}
+
+/* =========================================================================
+   CARD 2 — Accepts any task (success)
+   Motif: a checkbox flies in, its checkmark draws itself, then flies out.
+   Border: the ring draws all the way around, like a task completing.
+========================================================================= */
+.s21-card:hover .s21-motif--check {
+  animation: s21-fly 2s ease-in-out infinite;
+}
+.s21-motif--check .s21-tick {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+}
+.s21-card:hover .s21-motif--check .s21-tick {
+  animation: s21-tick 2s ease-in-out infinite;
+}
+@keyframes s21-tick {
+  0%,
+  20% {
+    stroke-dashoffset: 22;
+  }
+  45%,
+  72% {
+    stroke-dashoffset: 0;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 22;
+  }
+}
+
+.s21-frame--draw {
+  background: conic-gradient(from -90deg, currentColor var(--s21-fill), transparent 0);
+}
+.s21-card:hover .s21-frame--draw {
+  animation: s21-draw 1.9s ease-in-out infinite;
+}
+@keyframes s21-draw {
+  0% {
+    --s21-fill: 0%;
+  }
+  70%,
+  100% {
+    --s21-fill: 100%;
+  }
+}
+
+/* =========================================================================
+   CARD 3 — Tireless (success)
+   Motif: an infinity symbol whose stroke flows endlessly.
+   Border: marching dashes that never stop.
+========================================================================= */
+.s21-motif--loop {
+  opacity: 0;
+}
+.s21-card:hover .s21-motif--loop {
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+.s21-motif--loop .s21-inf {
+  stroke-dasharray: 10 6;
+}
+.s21-card:hover .s21-motif--loop .s21-inf {
+  animation: s21-flow 0.9s linear infinite;
+}
+@keyframes s21-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.s21-frame--march {
+  border-radius: inherit;
+  background-image:
+    repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(0deg, currentColor 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(0deg, currentColor 0 8px, transparent 8px 16px);
+  background-size:
+    16px 2px,
+    16px 2px,
+    2px 16px,
+    2px 16px;
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    100% 0;
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+}
+.s21-card:hover .s21-frame--march {
+  animation: s21-march 0.6s linear infinite;
+}
+@keyframes s21-march {
+  to {
+    background-position:
+      16px 0,
+      -16px 100%,
+      0 -16px,
+      100% 16px;
+  }
+}
+
+/* =========================================================================
+   CARD 4 — No questions. (error)
+   Motif: a "?" flies in, then a slash strikes through it.
+   Border: a broken, gapped dashed border that jitters — the assumed gaps.
+========================================================================= */
+.s21-card:hover .s21-motif--noq {
+  animation: s21-fly 1.7s ease-in-out infinite;
+}
+.s21-motif--noq .s21-slash {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140%;
+  height: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
+  transform-origin: center;
+}
+.s21-card:hover .s21-motif--noq .s21-slash {
+  animation: s21-slash 1.7s ease-in-out infinite;
+}
+@keyframes s21-slash {
+  0%,
+  40% {
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
+  }
+  58%,
+  72% {
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(1);
+  }
+  85%,
+  100% {
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
+  }
+}
+
+.s21-frame--gap {
+  border: 2px dashed currentColor;
+  border-radius: inherit;
+}
+.s21-card:hover .s21-frame--gap {
+  animation: s21-gap 0.45s steps(2, end) infinite;
+}
+@keyframes s21-gap {
+  0% {
+    opacity: 0.75;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translate(0.5px, -0.5px);
+  }
+  100% {
+    opacity: 0.75;
+    transform: translate(-0.5px, 0.5px);
+  }
+}
+
+/* =========================================================================
+   CARD 5 — Eager to please/bill. (error)
+   Motif: money bills burst out from the border in scattered directions,
+          spin, and vanish — the meter bleeding money.
+   Border: a double "ka-ching" glow pulse (inset).
+========================================================================= */
+.s21-bills {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.s21-bill {
+  position: absolute;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.3);
+  will-change: transform, opacity;
+}
+.s21-card:hover .s21-bill {
+  animation: s21-emit 1.7s ease-out infinite;
+}
+/* Each bill leaves from a different point on the border, in its own
+   direction (--dx/--dy) and with its own spin (--r), staggered in time. */
+.s21-bill:nth-child(1) {
+  top: 8%;
+  left: 50%;
+  --dx: 2px;
+  --dy: -58px;
+  --r: -22deg;
+  animation-delay: 0s;
+}
+.s21-bill:nth-child(2) {
+  top: 12%;
+  left: 80%;
+  --dx: 52px;
+  --dy: -42px;
+  --r: 28deg;
+  animation-delay: 0.28s;
+}
+.s21-bill:nth-child(3) {
+  top: 60%;
+  left: 88%;
+  --dx: 60px;
+  --dy: 18px;
+  --r: 18deg;
+  animation-delay: 0.56s;
+}
+.s21-bill:nth-child(4) {
+  top: 88%;
+  left: 55%;
+  --dx: -4px;
+  --dy: 56px;
+  --r: -16deg;
+  animation-delay: 0.84s;
+}
+.s21-bill:nth-child(5) {
+  top: 70%;
+  left: 14%;
+  --dx: -56px;
+  --dy: 34px;
+  --r: -30deg;
+  animation-delay: 1.12s;
+}
+.s21-bill:nth-child(6) {
+  top: 16%;
+  left: 20%;
+  --dx: -50px;
+  --dy: -40px;
+  --r: 32deg;
+  animation-delay: 1.4s;
+}
+@keyframes s21-emit {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.3);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--dx) * 0.15), calc(-50% + var(--dy) * 0.15))
+      rotate(calc(var(--r) * 0.15)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)) scale(0.5);
+  }
+}
+
+.s21-frame--ching {
+  box-shadow: inset 0 0 0 0 transparent;
+}
+.s21-card:hover .s21-frame--ching {
+  animation: s21-ching 1.1s ease-out infinite;
+}
+@keyframes s21-ching {
+  0% {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 0%, transparent);
+  }
+  10% {
+    box-shadow: inset 0 0 14px 1px color-mix(in oklab, currentColor 55%, transparent);
+  }
+  22% {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 0%, transparent);
+  }
+  36% {
+    box-shadow: inset 0 0 14px 1px color-mix(in oklab, currentColor 55%, transparent);
+  }
+  50%,
+  100% {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 0%, transparent);
+  }
+}
+
+/* =========================================================================
+   CARD 6 — It remembers nothing. (error)
+   Motif: a "0" appears, then dissolves into blur — memory wiped.
+   Content: the heading + paragraph briefly fade toward blank and snap back.
+   Border: the ring draws in, then erases back to nothing.
+========================================================================= */
+.s21-card:hover .s21-motif--mem {
+  animation: s21-dissolve 2.2s ease-in-out infinite;
+}
+@keyframes s21-dissolve {
+  0% {
+    opacity: 0;
+    transform: translate(55%, -55%) scale(0.5);
+    filter: blur(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1.25);
+    filter: blur(5px);
+  }
+}
+
+.s21-card:hover .s21-fade {
+  animation: s21-fade 2.2s ease-in-out infinite;
+}
+@keyframes s21-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  46%,
+  54% {
+    opacity: 0.12;
+  }
+}
+
+.s21-frame--wipe {
+  background: conic-gradient(from -90deg, currentColor var(--s21-fill), transparent 0);
+}
+.s21-card:hover .s21-frame--wipe {
+  animation: s21-wipe 2.2s ease-in-out infinite;
+}
+@keyframes s21-wipe {
+  0% {
+    --s21-fill: 0%;
+  }
+  42%,
+  54% {
+    --s21-fill: 100%;
+  }
+  100% {
+    --s21-fill: 0%;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Respect users who ask for less motion: no animations, no lingering overlays.
+----------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .s21-card *,
+  .s21-card *::before {
+    animation: none !important;
+  }
+  .s21-motif,
+  .s21-frame,
+  .s21-shimmer,
+  .s21-bills {
+    opacity: 0 !important;
+  }
+  .s21-fade {
+    opacity: 1 !important;
+  }
+}

@@ -1,0 +1,110 @@
+---
+// S1.1 — hero. The ambient meter is the through-line of the whole talk.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import TokenMeter from '../primitives/TokenMeter.astro';
+const hero = `${import.meta.env.BASE_URL}token-101/hero.webp`.replace(/\/{2,}/g, '/');
+---
+
+<div class="s11">
+  <div class="s11__backdrop" aria-hidden="true">
+    <img src={hero} alt="" />
+    <div class="s11__scrim"></div>
+  </div>
+
+  <BeatHeader
+    code="S1.1"
+    section="Intro"
+    title="The AI Token Economy"
+    size="hero"
+    lede="AI can give you and the people you lead super powers, but it comes with hidden managing responsibilities you didn't sign up for."
+  >
+    <p class="s11__sub">A general overview.</p>
+  </BeatHeader>
+
+  <div class="s11__meter">
+    <TokenMeter label="tokens billed · unwatched" />
+  </div>
+
+  <a href="#s2-1" data-toc-jump="s2-1" class="s11__cue" aria-label="Scroll to the first section">
+    <span>scroll</span>
+    <span class="s11__chev" aria-hidden="true">⌄</span>
+  </a>
+</div>
+
+<style>
+  .s11 {
+    position: relative;
+  }
+  /* Backdrop is confined to the top half so it reads as a header accent rather
+     than washing over the whole viewport — as in the harvest. */
+  .s11__backdrop {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: -6rem;
+    height: 60%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .s11__backdrop img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    filter: saturate(0.45) contrast(1.25);
+  }
+  .s11__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      var(--k-bg),
+      color-mix(in oklab, var(--k-bg) 35%, transparent),
+      var(--k-bg)
+    );
+  }
+  .s11__sub {
+    margin-block-start: 1rem;
+    color: var(--k-fg-subtle);
+    line-height: 1.65;
+  }
+  .s11__meter {
+    margin-block-start: 4rem;
+    text-align: end;
+    opacity: 0.55;
+  }
+  .s11__cue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-block-start: 3rem;
+    color: var(--k-fg-subtle);
+    text-decoration: none;
+    font-family: var(--k-font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+  }
+  .s11__cue:hover {
+    color: var(--k-accent);
+  }
+  .s11__chev {
+    font-size: 1.25rem;
+    animation: s11-bounce 1.4s infinite;
+  }
+  @keyframes s11-bounce {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 0.35rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s11__chev {
+      animation: none;
+    }
+  }
+</style>

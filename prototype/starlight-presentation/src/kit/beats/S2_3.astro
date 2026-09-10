@@ -1,0 +1,134 @@
+---
+// S2.3 — the discipline timeline. The last entry is deliberately unsettled.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Chip from '../primitives/Chip.astro';
+import Cite from '../primitives/Cite.astro';
+
+const ERAS = [
+  { when: '2022–23', flow: 'chat workflow', name: 'Prompt Engineering', body: 'How to talk to the AI — phrasing, examples, and the right ask.', note: null, cta: 'Workshop → coming soon' },
+  { when: '2024–25', flow: 'agentic workflow', name: 'Context Engineering', body: 'Give it the right context — AGENTS.md, skills, memory.', note: 'term: Karpathy, 2025', cta: 'Workshop → coming soon' },
+  { when: '2025–26', flow: 'autonomous workflow', name: 'Harness Engineering', body: 'Engineer the system around the model — tools, guardrails, feedback.', note: null, cta: 'Workshop → coming soon' },
+  { when: '2026 →', flow: 'self-improving loop', name: 'Loop Engineering', body: "Autonomous agents in a self-improving loop. Still forming — the name isn't settled, and I won't pretend it is.", note: 'emerging', cta: 'Workshop → not yet' },
+];
+---
+
+<div class="s23">
+  <BeatHeader code="S2.3" section="Motivation">
+    <h2 class="s23__h">New technology gives rise to <em>new disciplines</em> for humans to cope.</h2>
+  </BeatHeader>
+
+  <ol class="s23__rail">
+    {
+      ERAS.map((e, i) => (
+        <li class="s23__era" data-emerging={i === ERAS.length - 1 ? '' : undefined}>
+          <p class="s23__when">{e.when}</p>
+          <p class="s23__flow">{e.flow}</p>
+          <h3 class="s23__name">
+            {e.name}
+            {i === ERAS.length - 1 && <span class="s23__q">?</span>}
+          </h3>
+          <p class="s23__body">{e.body}</p>
+          {e.note && (
+            <p class="s23__note">
+              {e.note}
+              {e.name === 'Context Engineering' && <Cite n={13} />}
+            </p>
+          )}
+          <p class="s23__cta"><Chip mono={false}>{e.cta}</Chip></p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="s23__foundation">
+    <span class="s23__flabel">the foundation, under every era</span>
+    <strong>Token Economy — the currency of every era</strong>
+  </p>
+</div>
+
+<style>
+  .s23__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    max-width: 40ch;
+  }
+  .s23__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s23__rail {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2.5rem;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .s23__era {
+    border-block-start: 2px solid var(--k-accent);
+    padding-block-start: 0.85rem;
+  }
+  .s23__era[data-emerging] {
+    border-block-start-style: dashed;
+    border-block-start-color: var(--k-fg-faint);
+  }
+  .s23__when {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-accent-high);
+    margin: 0;
+  }
+  .s23__era[data-emerging] .s23__when {
+    color: var(--k-fg-subtle);
+  }
+  .s23__flow {
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+    margin: 0.15rem 0 0;
+  }
+  .s23__name {
+    font-size: var(--k-text-lg);
+    margin: 0.5rem 0 0.35rem;
+  }
+  .s23__q {
+    color: var(--k-holding);
+    margin-inline-start: 0.25rem;
+  }
+  .s23__body {
+    font-size: var(--k-text-sm);
+    line-height: 1.6;
+    color: var(--k-fg-muted);
+    margin: 0;
+  }
+  .s23__note {
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+    margin: 0.4rem 0 0;
+  }
+  .s23__cta {
+    margin: 0.6rem 0 0;
+  }
+  .s23__foundation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-block-start: 2rem;
+    border-block-start: 1px solid var(--k-border);
+    padding-block-start: 1rem;
+  }
+  .s23__flabel {
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--k-fg-subtle);
+  }
+  .s23__foundation strong {
+    color: var(--k-warn);
+  }
+</style>

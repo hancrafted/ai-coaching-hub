@@ -1,0 +1,43 @@
+---
+// Absorbs `.va__evidence:284` and daisyUI `card` ×43 from the harvest.
+interface Props {
+  title?: string;
+  tone?: 'default' | 'raised' | 'warn';
+  class?: string;
+}
+const { title, tone = 'default', class: className } = Astro.props;
+---
+
+<div class:list={['k-panel', className]} data-tone={tone}>
+  {title && <p class="k-panel__title">{title}</p>}
+  <slot />
+</div>
+
+<style>
+  .k-panel {
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius);
+    padding: 0.75rem 1rem;
+    background: var(--k-surface-raised);
+    font-size: var(--k-text-sm);
+  }
+  .k-panel[data-tone='raised'] {
+    background: var(--k-surface);
+  }
+  .k-panel[data-tone='warn'] {
+    border-style: dashed;
+    border-color: var(--k-warn);
+    background: var(--k-warn-low);
+  }
+  .k-panel__title {
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--k-fg-subtle);
+    margin: 0 0 0.4rem;
+  }
+  .k-panel :global(ul) {
+    margin: 0;
+    line-height: 1.55;
+  }
+</style>

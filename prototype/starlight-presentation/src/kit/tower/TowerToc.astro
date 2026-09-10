@@ -1,0 +1,175 @@
+---
+// Server-rendered TOC. The harvest injected this as an innerHTML string from
+// presentation.js, so it did not exist without JS and Pagefind never saw it.
+import { BEAT_SECTIONS } from './beats';
+interface Props {
+  progressId?: string;
+}
+const { progressId } = Astro.props;
+const pad2 = (n: string) => n.padStart(2, '0');
+---
+
+<div class="toc">
+  <div class="toc__head">
+    <p class="toc__label">Contents</p>
+    <div class="toc__track">
+      <div class="toc__bar" data-tower-progress id={progressId}></div>
+    </div>
+  </div>
+  <nav class="toc__nav" aria-label="Table of contents">
+    {
+      BEAT_SECTIONS.map((section) => (
+        <div class="toc__section" data-toc-section={section.num}>
+          <button
+            type="button"
+            class="toc__section-header"
+            data-section-toggle={section.num}
+            aria-expanded="false"
+          >
+            <span class="toc__section-label">
+              <span class="toc__section-num">{pad2(section.num)}</span>
+              <span class="toc__section-title">{section.title}</span>
+            </span>
+            <span class="toc__caret" data-caret aria-hidden="true">▾</span>
+          </button>
+          <div class="toc__beats is-collapsed" data-section-beats={section.num}>
+            {section.beats.map((b) => (
+              <a href={`#${b.id}`} data-toc-jump={b.id} class="toc__beat">
+                <span class="toc__beat-code">{b.code}</span>
+                <span class="toc__beat-title">{b.assertion}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </nav>
+</div>
+
+<style>
+  .toc {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    font-size: var(--k-text-sm);
+  }
+  .toc__head {
+    padding: 1.25rem;
+    border-block-end: 1px solid var(--k-border);
+  }
+  .toc__label {
+    font-family: var(--k-font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--k-fg-subtle);
+    margin: 0;
+  }
+  .toc__track {
+    margin-block-start: 0.75rem;
+    height: 4px;
+    border-radius: var(--k-radius-pill);
+    background: var(--k-border);
+    overflow: hidden;
+  }
+  .toc__bar {
+    height: 100%;
+    width: 0;
+    background: var(--k-accent);
+    transition: width 300ms ease-out;
+  }
+  .toc__nav {
+    flex: 1;
+    padding: 0.5rem;
+    overflow-y: auto;
+  }
+  .toc__section-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-radius: var(--k-radius);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .toc__section-header:hover {
+    background: color-mix(in oklab, var(--k-border) 50%, transparent);
+  }
+  .toc__section-label {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .toc__section-num {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .toc__section-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .toc__caret {
+    color: var(--k-fg-subtle);
+    transition: rotate 200ms;
+  }
+  .toc__caret.is-open {
+    rotate: 180deg;
+  }
+  .toc__beats {
+    padding-inline-start: 0.5rem;
+  }
+  .toc__beats.is-collapsed {
+    display: none;
+  }
+  .toc__beat {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--k-radius);
+    text-decoration: none;
+    color: inherit;
+  }
+  .toc__beat:hover {
+    background: color-mix(in oklab, var(--k-border) 50%, transparent);
+  }
+  .toc__beat.is-active {
+    background: color-mix(in oklab, var(--k-accent) 12%, transparent);
+  }
+  .toc__beat-code {
+    display: block;
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+  }
+  .toc__beat-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-block-start: 0.1rem;
+    font-size: var(--k-text-sm);
+    line-height: 1.35;
+    color: var(--k-fg-muted);
+  }
+  .toc__beat.is-active .toc__beat-title {
+    color: var(--k-accent-high);
+    font-weight: 500;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toc__bar,
+    .toc__caret {
+      transition: none;
+    }
+  }
+</style>

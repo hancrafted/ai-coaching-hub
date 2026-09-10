@@ -1,0 +1,47 @@
+---
+// Module 1 on the BARE tree. Same three variants, same switcher, no Starlight.
+//
+// NOTE what this route cost. Prototype 1's variants looked stack-agnostic but
+// were coupled to Starlight in TWO separate ways, and the first build of this
+// page proved it — 105 `--sl-*` references in the emitted CSS and no chrome at
+// all:
+//   1. tokens — all three variants referenced `--sl-*` directly (39/37/29
+//      call sites). Migrated to the kit's `--k-*` contract.
+//   2. delivery — `prototype.css` shipped only through Starlight's `customCss`,
+//      so the bare tree got none of it. Split into `styles/chrome.css` (both
+//      trees) and `styles/starlight-only.css` (the `.sl-*` overrides).
+// Only after both were unpicked did the variants become genuinely portable.
+import BareLayout from '../../layouts/BareLayout.astro';
+import VariantAScript from '../../components/VariantAScript.astro';
+import VariantBRunOfShow from '../../components/VariantBRunOfShow.astro';
+import VariantCArgument from '../../components/VariantCArgument.astro';
+import VariantSwitcher from '../../components/VariantSwitcher.astro';
+import { TALK } from '../../talk';
+
+const VARIANTS = [
+  { key: 'A', name: 'Script', purpose: 'Read the talk top to bottom' },
+  { key: 'B', name: 'Run of show', purpose: 'Drive it on the day — and know what to cut' },
+  { key: 'C', name: 'Argument', purpose: 'Trace every claim to its source' },
+];
+---
+
+<BareLayout title={TALK.title} description={TALK.description} route="talk" fullBleed>
+  <div class="pfull barewrap">
+    <div data-variant-panel="A">
+      <VariantAScript />
+    </div>
+    <div data-variant-panel="B" hidden>
+      <VariantBRunOfShow />
+    </div>
+    <div data-variant-panel="C" hidden>
+      <VariantCArgument />
+    </div>
+    <VariantSwitcher variants={VARIANTS} />
+  </div>
+</BareLayout>
+
+<style>
+  .barewrap {
+    padding: 2rem clamp(1rem, 4vw, 2.5rem) 6rem;
+  }
+</style>

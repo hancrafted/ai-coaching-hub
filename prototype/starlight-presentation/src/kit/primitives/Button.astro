@@ -1,0 +1,62 @@
+---
+// Absorbs daisyUI `btn` ×14. Renders as <a> when `href` is set, else <button>.
+// `href` is passed through untouched — callers are responsible for BASE_URL,
+// because import.meta.env.BASE_URL is a path and cannot be resolved here.
+interface Props {
+  href?: string;
+  variant?: 'solid' | 'outline' | 'ghost';
+  size?: 'sm' | 'md';
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+}
+const { href, variant = 'solid', size = 'md', disabled = false, type = 'button' } = Astro.props;
+const Tag = href && !disabled ? 'a' : 'button';
+const attrs = href && !disabled ? { href } : { type, disabled: disabled || undefined };
+---
+
+<Tag class="k-btn" data-variant={variant} data-size={size} {...attrs}><slot /></Tag>
+
+<style>
+  .k-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: var(--k-radius-pill);
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    font: inherit;
+    font-size: var(--k-text-sm);
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    background: var(--k-accent);
+    color: var(--k-bg);
+  }
+  .k-btn[data-size='sm'] {
+    padding: 0.3rem 0.7rem;
+    font-size: var(--k-text-xs);
+  }
+  .k-btn[data-variant='outline'] {
+    background: transparent;
+    border-color: var(--k-border);
+    color: var(--k-fg);
+  }
+  .k-btn[data-variant='ghost'] {
+    background: transparent;
+    color: var(--k-fg-muted);
+  }
+  .k-btn:hover:not([disabled]) {
+    filter: brightness(1.1);
+  }
+  .k-btn[data-variant='outline']:hover:not([disabled]),
+  .k-btn[data-variant='ghost']:hover:not([disabled]) {
+    filter: none;
+    border-color: var(--k-accent);
+    color: var(--k-accent-high);
+  }
+  .k-btn[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+</style>

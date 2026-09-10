@@ -1,0 +1,262 @@
+---
+// S2.5 — LIVE CONTROL 1 of 4: drag the customer's quality threshold and the
+// financial winner flips. Logic ported from presentation.js:1207 verbatim
+// (QUALITY_CHEAP = 95, QUALITY_PREMIUM = 99).
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+import Panel from '../primitives/Panel.astro';
+---
+
+<div class="s25">
+  <BeatHeader code="S2.5" section="Motivation">
+    <h2 class="s25__h">
+      You're now accountable for a budget you <em>never signed up to manage.</em>
+    </h2>
+  </BeatHeader>
+
+  <div class="s25__models">
+    <Panel>
+      <h3 class="s25__mh">Premium model</h3>
+      <p class="s25__price">5× the price</p>
+      <p class="s25__qlabel">Quality delivered</p>
+      <div class="s25__track">
+        <div class="s25__fill" data-fill="99"></div>
+        <span class="s25-marker" aria-hidden="true"></span>
+      </div>
+      <p class="s25__pct"><span data-count data-count-to="99">0</span>%</p>
+      <p class="s25__ope">Outcome per euro <strong>1×</strong></p>
+    </Panel>
+
+    <Panel>
+      <h3 class="s25__mh">
+        Cheaper model
+        <span id="s25-winner" class="s25__winner">financial winner</span>
+      </h3>
+      <p class="s25__price">1× the price</p>
+      <p class="s25__qlabel">Quality delivered</p>
+      <div class="s25__track">
+        <div class="s25__fill" data-fill="95"></div>
+        <span class="s25-marker" aria-hidden="true"></span>
+      </div>
+      <p class="s25__pct"><span data-count data-count-to="95">0</span>%</p>
+      <p class="s25__ope">Outcome per euro <strong>≈5×</strong></p>
+    </Panel>
+  </div>
+
+  <Panel tone="raised" class="s25__control">
+    <div class="s25__crow">
+      <label for="s25-threshold" class="s25__clabel">
+        Drag: what quality does your customer actually need?
+      </label>
+      <span class="s25__cval"><span id="s25-threshold-value">93</span>%</span>
+    </div>
+    <input
+      id="s25-threshold"
+      type="range"
+      min="90"
+      max="100"
+      value="93"
+      step="1"
+      class="s25__range"
+      aria-label="Customer quality threshold"
+    />
+    <p id="s25-verdict" class="s25__verdict">
+      At 93%, both models clear the bar — the cheaper one wins ≈5× outcome per euro.
+    </p>
+  </Panel>
+
+  <p class="s25__subsidy">
+    And today's prices are subsidized — vendors sell intelligence below what it costs to serve.
+    Analyst estimates run from <strong>~2× (inference alone) to ~10× (all-in spend vs. revenue)</strong><Cite
+      n={[10, 11]}
+    />. The first taste is cheap on purpose — and while per-token prices for equal capability keep
+    falling<Cite n={12} />, agentic workloads grow consumption faster than prices drop.
+  </p>
+
+  <p class="s25__kicker">The winner isn't the best outcome. It's the best outcome per input.</p>
+</div>
+
+<style>
+  .s25__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    max-width: 44ch;
+  }
+  .s25__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s25__models {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+  .s25__mh {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--k-text-lg);
+    margin: 0;
+  }
+  .s25__winner {
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--k-solved);
+    border: 1px solid color-mix(in oklab, var(--k-solved) 45%, transparent);
+    border-radius: var(--k-radius-pill);
+    padding: 0.1rem 0.45rem;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .s25__winner.is-shown {
+    opacity: 1;
+  }
+  .s25__price {
+    margin: 0.2rem 0 0.85rem;
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .s25__qlabel {
+    margin: 0 0 0.35rem;
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--k-fg-subtle);
+  }
+  .s25__track {
+    position: relative;
+    height: 0.6rem;
+    border-radius: var(--k-radius-pill);
+    background: var(--k-border);
+    overflow: visible;
+  }
+  .s25__fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--k-radius-pill);
+    background: var(--k-accent);
+    transition: width 1200ms ease-out;
+  }
+  .s25-marker {
+    position: absolute;
+    inset-block: -0.3rem;
+    left: 93%;
+    width: 2px;
+    background: var(--k-warn);
+  }
+  .s25__pct {
+    margin: 0.4rem 0 0;
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  .s25__ope {
+    margin: 0.5rem 0 0;
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
+  }
+  .s25__control {
+    margin-block-start: 1.5rem;
+  }
+  .s25__crow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .s25__clabel {
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
+  }
+  .s25__cval {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--k-warn);
+  }
+  .s25__range {
+    width: 100%;
+    margin-block-start: 0.75rem;
+    accent-color: var(--k-accent);
+  }
+  .s25__verdict {
+    margin: 0.75rem 0 0;
+    font-size: var(--k-text-sm);
+    line-height: 1.65;
+    color: var(--k-fg-muted);
+  }
+  .s25__subsidy {
+    margin-block-start: 1.5rem;
+    font-size: var(--k-text-sm);
+    line-height: 1.7;
+    color: var(--k-fg-muted);
+  }
+  .s25__kicker {
+    margin-block-start: 1.25rem;
+    font-size: var(--k-text-lg);
+    font-weight: 700;
+    color: var(--k-fg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s25__fill,
+    .s25__winner {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp } from '../format';
+
+  registerActivate('s2-5', (reduced) => {
+    const fills = document.querySelectorAll<HTMLElement>('#s2-5 [data-fill]');
+    const counts = document.querySelectorAll<HTMLElement>('#s2-5 [data-count]');
+    const winner = document.getElementById('s25-winner');
+    const applyFills = () => {
+      for (const el of fills) el.style.width = `${el.dataset.fill}%`;
+    };
+    if (reduced) {
+      applyFills();
+      for (const el of counts) el.textContent = el.dataset.countTo ?? '';
+      winner?.classList.add('is-shown');
+      return;
+    }
+    window.setTimeout(applyFills, 150);
+    for (const el of counts) countUp(el, Number(el.dataset.countTo), { duration: 1200 });
+    window.setTimeout(() => winner?.classList.add('is-shown'), 900);
+  });
+
+  // LIVE CONTROL — ported verbatim from presentation.js:1207.
+  const slider = document.getElementById('s25-threshold') as HTMLInputElement | null;
+  const valueEl = document.getElementById('s25-threshold-value');
+  const verdictEl = document.getElementById('s25-verdict');
+  const winnerEl = document.getElementById('s25-winner');
+  const markers = document.querySelectorAll<HTMLElement>('#s2-5 .s25-marker');
+  if (slider && valueEl && verdictEl) {
+    const QUALITY_CHEAP = 95;
+    const QUALITY_PREMIUM = 99;
+    const update = () => {
+      const t = Number(slider.value);
+      valueEl.textContent = String(t);
+      for (const m of markers) m.style.left = `${t}%`;
+      if (t <= QUALITY_CHEAP) {
+        verdictEl.textContent = `At ${t}%, both models clear the bar — the cheaper one wins ≈5× outcome per euro.`;
+      } else if (t <= QUALITY_PREMIUM) {
+        verdictEl.textContent = `At ${t}%, only the premium model clears the bar — now the 5× price actually buys something.`;
+      } else {
+        verdictEl.textContent = 'Neither model reaches 100%. Rethink the task, not the model.';
+      }
+      winnerEl?.classList.toggle('is-shown', t <= QUALITY_CHEAP);
+    };
+    slider.addEventListener('input', update);
+  }
+</script>

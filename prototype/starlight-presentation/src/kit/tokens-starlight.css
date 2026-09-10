@@ -1,0 +1,49 @@
+/* STARLIGHT ADAPTER — loaded via `customCss`, i.e. only on the Starlight tree.
+ *
+ * Re-points the kit contract at Starlight's own tokens so Starlight keeps
+ * owning theming end to end: its light/dark toggle, its FOUC guard, its
+ * `data-theme` attribute. The kit never learns which stack it is on.
+ *
+ * This is issue #4's claim ("Radix steps become the `--sl-color-*` tokens")
+ * turned around: the kit does not adopt Starlight's palette, it *accepts* one.
+ * Cost of the adapter is 1 line per token — see /findings.
+ *
+ * Note `--sl-color-gray-7` exists in light mode only, hence the fallback.
+ */
+
+:root,
+:root[data-theme='light'] {
+  --k-fg: var(--sl-color-white);
+  --k-fg-muted: var(--sl-color-gray-2);
+  --k-fg-subtle: var(--sl-color-gray-3);
+  --k-fg-faint: var(--sl-color-gray-4);
+  --k-border: var(--sl-color-gray-5);
+  --k-border-soft: var(--sl-color-gray-6);
+  --k-surface: var(--sl-color-gray-6);
+  --k-surface-raised: var(--sl-color-gray-7, var(--sl-color-black));
+  --k-bg: var(--sl-color-bg);
+
+  --k-accent: var(--sl-color-accent);
+  --k-accent-high: var(--sl-color-accent-high);
+  --k-accent-low: var(--sl-color-accent-low);
+
+  --k-warn: var(--sl-color-orange);
+  --k-warn-high: var(--sl-color-orange-high);
+  --k-warn-low: var(--sl-color-orange-low);
+
+  --k-font: var(--sl-font, var(--sl-font-system));
+  --k-font-mono: var(--sl-font-mono, var(--sl-font-system-mono));
+  --k-text-xs: var(--sl-text-xs);
+  --k-text-sm: var(--sl-text-sm);
+  --k-text-base: var(--sl-text-base);
+  --k-text-lg: var(--sl-text-lg);
+  --k-text-xl: var(--sl-text-xl);
+  --k-text-2xl: var(--sl-text-2xl);
+  --k-text-3xl: var(--sl-text-3xl);
+  --k-text-4xl: var(--sl-text-4xl);
+  --k-text-5xl: var(--sl-text-5xl);
+  --k-line: var(--sl-line-height);
+  --k-line-tight: var(--sl-line-height-headings);
+
+  --k-measure: var(--sl-content-width);
+}

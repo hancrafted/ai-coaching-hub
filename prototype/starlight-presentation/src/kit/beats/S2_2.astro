@@ -1,0 +1,125 @@
+---
+// S2.2 — two doors: manage it yourself, or upskill a team.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Panel from '../primitives/Panel.astro';
+import Thesis from '../primitives/Thesis.astro';
+const freelancer = `${import.meta.env.BASE_URL}token-101/freelancer.webp`.replace(/\/{2,}/g, '/');
+---
+
+<div class="s22">
+  <BeatHeader code="S2.2" section="Motivation">
+    <h2 class="s22__h">It's an LLM — but if it were a human, <em>how would you manage it?</em></h2>
+  </BeatHeader>
+
+  <p class="s22__lede">
+    You can opt out of managing it. The people who don't will simply out-produce you.
+  </p>
+
+  <Thesis label="My working estimate from daily practice">
+    <span class="s22__mult">5–<span data-count-to="20" class="s22__num">20</span>×</span>
+    the throughput on AI-suited tasks — and the better-paying roles are already going to the
+    fluent.
+  </Thesis>
+
+  <div class="s22__doors">
+    <Panel>
+      <p class="s22__door">door 1 · the individual</p>
+      <h3 class="s22__dh">Human with AI</h3>
+      <img src={freelancer} alt="" class="s22__img" />
+      <p class="s22__db">
+        You and (possibly multiple) AI. How would you work with it, day to day — brief it, check
+        it, catch what it won't tell you?
+      </p>
+    </Panel>
+    <Panel>
+      <p class="s22__door">door 2 · the leader</p>
+      <h3 class="s22__dh">Upskill many</h3>
+      <div class="s22__fanout" aria-hidden="true">
+        <span>AI</span><span>AI</span><span>AI</span>
+      </div>
+      <p class="s22__db">
+        And if you lead people — how do you get your whole team fluent at leading them?
+      </p>
+    </Panel>
+  </div>
+</div>
+
+<style>
+  .s22__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    max-width: 44ch;
+  }
+  .s22__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s22__lede {
+    margin-block: 1.25rem 1.5rem;
+    color: var(--k-fg-muted);
+    line-height: 1.65;
+    max-width: 60ch;
+  }
+  .s22__mult {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--k-text-2xl);
+    color: var(--k-accent-high);
+    margin-inline-end: 0.35rem;
+  }
+  .s22__doors {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+  .s22__door {
+    font-family: var(--k-font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--k-fg-subtle);
+    margin: 0;
+  }
+  .s22__dh {
+    font-size: var(--k-text-xl);
+    margin: 0.35rem 0 0.75rem;
+  }
+  .s22__img {
+    width: 100%;
+    max-width: 12rem;
+    border-radius: var(--k-radius);
+    filter: saturate(0.5);
+  }
+  .s22__fanout {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .s22__fanout span {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--k-radius-pill);
+    border: 1px solid var(--k-accent);
+    color: var(--k-accent-high);
+    font-family: var(--k-font-mono);
+    font-size: 0.7rem;
+  }
+  .s22__db {
+    margin-block-start: 0.85rem;
+    color: var(--k-fg-muted);
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp } from '../format';
+  registerActivate('s2-2', (reduced) => {
+    const el = document.querySelector<HTMLElement>('#s2-2 [data-count-to]');
+    if (el) countUp(el, Number(el.dataset.countTo), { reduceMotion: reduced, duration: 900 });
+  });
+</script>

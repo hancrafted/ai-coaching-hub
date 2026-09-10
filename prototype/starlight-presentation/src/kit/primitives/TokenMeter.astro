@@ -1,0 +1,73 @@
+---
+// The ambient "unwatched tokens" meter, duplicated VERBATIM across both
+// harvested pages — same seed (1472318), same 3.2/ms rate, same
+// `Math.floor(n).toLocaleString('en-US')` format:
+//   coaching-content/index.html:243
+//   coaching-content/ai-token-economy-101/presentation.js:437
+// The original ran a separate rAF loop per page and wrote two elements by id
+// (`hero-meter`, `nav-meter-value`). Here one loop drives every instance, so
+// multiple meters on a page cannot drift apart.
+interface Props {
+  label?: string;
+  size?: 'sm' | 'lg';
+}
+const { label, size = 'lg' } = Astro.props;
+---
+
+<span class="k-meter" data-size={size}>
+  <span class="k-meter__value" data-k-meter>1,472,318</span>
+  {label && <span class="k-meter__label">{label}</span>}
+</span>
+
+<style>
+  .k-meter {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .k-meter__value {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--k-text-2xl);
+    font-weight: 700;
+    color: var(--k-warn);
+    line-height: 1;
+  }
+  .k-meter[data-size='sm'] .k-meter__value {
+    font-size: var(--k-text-sm);
+    font-weight: 600;
+  }
+  .k-meter__label {
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--k-fg-subtle);
+  }
+</style>
+
+<script>
+  // Ported from coaching-content, with the two duplicate loops collapsed to one.
+  const outs = Array.from(document.querySelectorAll('[data-k-meter]'));
+  if (outs.length > 0) {
+    const fmt = (n: number) => Math.floor(n).toLocaleString('en-US');
+    let value = 1472318; // the meter has been running long before you arrived
+    const write = (v: number) => {
+      const text = fmt(v);
+      for (const el of outs) el.textContent = text;
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      write(value);
+    } else {
+      let last: number | null = null;
+      const step = (ts: number) => {
+        if (last === null) last = ts;
+        value += (ts - last) * 3.2;
+        last = ts;
+        write(value);
+        window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    }
+  }
+</script>

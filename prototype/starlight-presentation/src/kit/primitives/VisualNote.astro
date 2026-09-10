@@ -1,0 +1,17 @@
+---
+// `.va__visual:280` and `.vb__visual:366` were byte-for-byte identical CSS under
+// two different names.
+interface Props {
+  label?: string;
+}
+const { label = 'Visual' } = Astro.props;
+---
+
+<p class="k-visual"><strong>{label}.</strong> <slot /></p>
+
+<style>
+  .k-visual {
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
+  }
+</style>

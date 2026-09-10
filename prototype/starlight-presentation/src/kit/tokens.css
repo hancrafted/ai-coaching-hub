@@ -1,0 +1,101 @@
+/* KIT TOKEN CONTRACT — the controlled variable of prototype 2.
+ *
+ * Every kit primitive consumes ONLY `--k-*`. Nothing in src/kit/ may reference
+ * `--sl-*` directly; that is what made prototype 1 un-portable (24 distinct
+ * Starlight tokens, 138 call sites, all load-bearing).
+ *
+ * This file is the SELF-CONTAINED baseline: literal values, dark default plus a
+ * `[data-theme='light']` override. It is everything the bare tree needs, and it
+ * is what `/findings` measures as "the cost of not having Starlight's palette".
+ *
+ * The Starlight tree loads this file AND `tokens-starlight.css`, which re-points
+ * every `--k-*` at the matching `--sl-*` so Starlight keeps owning theming
+ * (issue #4: "Starlight owns theming... no parallel palette").
+ *
+ * Attribute contract is deliberately Starlight's own (`:root` = dark,
+ * `[data-theme='light']` = light) so the kit is byte-identical on both trees and
+ * only the *driver* of that attribute differs. See /findings.
+ */
+
+:root {
+  /* --- greyscale ramp. Starlight's names are inverted (`white` = foreground),
+     so the kit renames them to what they actually do. --- */
+  --k-fg: hsl(0, 0%, 100%);
+  --k-fg-muted: hsl(224, 6%, 77%);
+  --k-fg-subtle: hsl(224, 6%, 56%);
+  --k-fg-faint: hsl(224, 7%, 36%);
+  --k-border: hsl(224, 10%, 23%);
+  --k-border-soft: hsl(224, 14%, 16%);
+  --k-surface: hsl(224, 14%, 16%);
+  --k-surface-raised: hsl(224, 10%, 10%);
+  --k-bg: hsl(224, 10%, 10%);
+
+  /* --- accent --- */
+  --k-accent: hsl(224, 100%, 60%);
+  --k-accent-high: hsl(224, 100%, 85%);
+  --k-accent-low: hsl(224, 54%, 20%);
+
+  /* --- warning / prototype-banner trio --- */
+  --k-warn: hsl(41, 82%, 63%);
+  --k-warn-high: hsl(41, 82%, 87%);
+  --k-warn-low: hsl(41, 39%, 22%);
+
+  /* --- type --- */
+  --k-font:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --k-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+  --k-text-xs: 0.8125rem;
+  --k-text-sm: 0.875rem;
+  --k-text-base: 1rem;
+  --k-text-lg: 1.125rem;
+  --k-text-xl: 1.25rem;
+  --k-text-2xl: 1.5rem;
+  --k-text-3xl: 1.8125rem;
+  --k-text-4xl: 2.1875rem;
+  --k-text-5xl: 2.625rem;
+  --k-line: 1.75;
+  --k-line-tight: 1.2;
+
+  /* --- layout --- */
+  --k-measure: 45rem;
+  --k-radius: 0.5rem;
+  --k-radius-sm: 0.25rem;
+  --k-radius-pill: 999px;
+
+  /* --- verdict ramp (prototype 1's --p-* vocabulary, promoted to the kit) --- */
+  --k-solved: #16a34a;
+  --k-holding: #d97706;
+  --k-split: #2563eb;
+  --k-amplified: #dc2626;
+  --k-rail: color-mix(in oklab, var(--k-surface) 60%, transparent);
+}
+
+:root[data-theme='light'] {
+  --k-fg: hsl(224, 10%, 10%);
+  --k-fg-muted: hsl(224, 10%, 23%);
+  --k-fg-subtle: hsl(224, 7%, 36%);
+  --k-fg-faint: hsl(224, 6%, 56%);
+  --k-border: hsl(224, 6%, 77%);
+  --k-border-soft: hsl(224, 20%, 94%);
+  --k-surface: hsl(224, 20%, 94%);
+  --k-surface-raised: hsl(224, 19%, 97%);
+  --k-bg: hsl(0, 0%, 100%);
+
+  --k-accent: hsl(234, 90%, 60%);
+  --k-accent-high: hsl(234, 80%, 30%);
+  --k-accent-low: hsl(234, 88%, 90%);
+
+  --k-warn: hsl(41, 90%, 60%);
+  --k-warn-high: hsl(41, 80%, 25%);
+  --k-warn-low: hsl(41, 90%, 88%);
+
+  /* The verdict ramp is tuned for dark; light needs its own darker steps or the
+     badges fail contrast on white. A real cost of owning a palette. */
+  --k-solved: #15803d;
+  --k-holding: #b45309;
+  --k-split: #1d4ed8;
+  --k-amplified: #b91c1c;
+}

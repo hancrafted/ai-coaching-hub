@@ -1,0 +1,259 @@
+---
+// S3.1 — LIVE CONTROL 2 of 4: the tokenizer playground. The crude BPE-ish
+// chunker, the 5-hue chip cycle, the 48-chip cap and the 50-turn Opus cost
+// estimate are all ported verbatim from presentation.js:1142.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+import Panel from '../primitives/Panel.astro';
+
+const QUOTE_TOKENS = ['Ins','anity','_is','_doing','_the','_same','_thing','_over','_and','_over','_again','_and','_expecting','_different','_results','.'];
+const BILLED = [
+  { k: 'input', v: 'every word you send — and re-send' },
+  { k: 'output', v: 'every word it says back' },
+  { k: 'cache write', v: 'storing context for reuse' },
+  { k: 'cache read', v: 'reusing it — ~10% of the input price' },
+];
+---
+
+<div class="s31">
+  <BeatHeader code="S3.1" section="What Is a Token">
+    <h2 class="s31__h">Tokens are the <em>basic unit of data for LLMs.</em></h2>
+  </BeatHeader>
+
+  <p class="s31__lede">
+    AI doesn't deal with words but with numbers to predict statistically the next likely token.
+    Every token is roughly 3/4 of a word<Cite n={1} /> and represented as a unique number.
+  </p>
+
+  <figure class="s31__quote">
+    <blockquote>
+      "Insanity is doing the same thing over and over again and expecting different results."
+    </blockquote>
+    <div class="s31__chips">
+      {QUOTE_TOKENS.map((t, i) => <span class="s31__chip" data-hue={i % 5}>{t}</span>)}
+    </div>
+  </figure>
+
+  <Panel tone="raised">
+    <label for="s31-input" class="s31__label">Try it — type anything</label>
+    <input
+      id="s31-input"
+      type="text"
+      maxlength="140"
+      placeholder="Type a sentence to see what the model sees…"
+      class="s31__input"
+    />
+    <div id="s31-chips" class="s31__chips s31__chips--live"></div>
+    <div class="s31__readout">
+      <span>
+        ≈ <span id="s31-count" class="s31__count">0</span> tokens
+        <span class="s31__hint">(approximate — every model splits differently)</span>
+      </span>
+      <span>
+        re-sent across a 50-turn agent session ≈
+        <span id="s31-cost" class="s31__count">$0.0000</span>
+        <span class="s31__hint">at Opus 4.8 input rates<Cite n={7} /></span>
+      </span>
+    </div>
+  </Panel>
+
+  <p class="s31__billed-h">Every one of them is billed 4 ways</p>
+  <ul class="s31__billed">
+    {BILLED.map((b) => (
+      <li>
+        <span class="s31__bk">{b.k}</span>
+        <span class="s31__bv">{b.v}{b.k === 'cache read' && <Cite n={7} />}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .s31__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .s31__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s31__lede {
+    margin-block: 1.25rem 1.5rem;
+    color: var(--k-fg-muted);
+    line-height: 1.7;
+    max-width: 62ch;
+  }
+  .s31__quote {
+    margin: 0 0 1.5rem;
+  }
+  .s31__quote blockquote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: var(--k-text-lg);
+    line-height: 1.6;
+    color: var(--k-fg);
+  }
+  .s31__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-block-start: 1rem;
+  }
+  .s31__chips--live {
+    min-height: 2.5rem;
+    margin-block-start: 1rem;
+  }
+  /* :global because the tokenizer playground CREATES these nodes at runtime.
+     Astro's scoped CSS only rewrites selectors it can see in the template, so a
+     scoped `.s31__chip` would never match a JS-built chip. The harvest never hit
+     this: its chips carried Tailwind utility classes, which are always global.
+     Logged as a finding — Astro's component model taxes imperative DOM. */
+  :global(.s31__chip) {
+    border-radius: var(--k-radius-sm);
+    border: 1px solid;
+    padding: 0.2rem 0.45rem;
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    font-weight: 600;
+    white-space: pre;
+  }
+  /* Five semantic hues, cycling — the harvest skipped daisyUI `secondary`
+     because it rendered near-grey; the kit has no such trap. */
+  :global(.s31__chip[data-hue='0']) { color: var(--k-accent); border-color: color-mix(in oklab, var(--k-accent) 40%, transparent); background: color-mix(in oklab, var(--k-accent) 15%, transparent); }
+  :global(.s31__chip[data-hue='1']) { color: var(--k-split); border-color: color-mix(in oklab, var(--k-split) 40%, transparent); background: color-mix(in oklab, var(--k-split) 15%, transparent); }
+  :global(.s31__chip[data-hue='2']) { color: var(--k-amplified); border-color: color-mix(in oklab, var(--k-amplified) 40%, transparent); background: color-mix(in oklab, var(--k-amplified) 15%, transparent); }
+  :global(.s31__chip[data-hue='3']) { color: var(--k-solved); border-color: color-mix(in oklab, var(--k-solved) 40%, transparent); background: color-mix(in oklab, var(--k-solved) 15%, transparent); }
+  :global(.s31__chip[data-hue='4']) { color: var(--k-holding); border-color: color-mix(in oklab, var(--k-holding) 40%, transparent); background: color-mix(in oklab, var(--k-holding) 15%, transparent); }
+  .s31__label {
+    display: block;
+    font-family: var(--k-font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--k-fg-subtle);
+  }
+  .s31__input {
+    width: 100%;
+    margin-block-start: 0.75rem;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-sm);
+    background: var(--k-bg);
+    color: var(--k-fg);
+    font: inherit;
+  }
+  .s31__input:focus-visible {
+    outline: 2px solid var(--k-accent);
+    outline-offset: 1px;
+  }
+  .s31__readout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-block-start: 0.85rem;
+    border-block-start: 1px solid var(--k-border);
+    padding-block-start: 0.75rem;
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
+  }
+  .s31__count {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--k-accent-high);
+  }
+  :global(.s31__hint) {
+    display: block;
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .s31__billed-h {
+    margin-block: 1.75rem 0.75rem;
+    font-weight: 700;
+  }
+  .s31__billed {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  }
+  .s31__billed li {
+    border-inline-start: 2px solid var(--k-accent);
+    padding-inline-start: 0.7rem;
+  }
+  .s31__bk {
+    display: block;
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--k-accent-high);
+  }
+  .s31__bv {
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
+    line-height: 1.5;
+  }
+</style>
+
+<script>
+  // LIVE CONTROL — ported verbatim from presentation.js:1142.
+  const input = document.getElementById('s31-input') as HTMLInputElement | null;
+  const chipsEl = document.getElementById('s31-chips');
+  const countEl = document.getElementById('s31-count');
+  const costEl = document.getElementById('s31-cost');
+
+  if (input && chipsEl && countEl && costEl) {
+    const OPUS_INPUT_PER_TOKEN = 5 / 1e6; // $5 per 1M input tokens (July 2026 list)
+    const SESSION_TURNS = 50;
+    const MAX_CHIPS = 48;
+
+    // Crude BPE-ish chunker: short words stay whole, longer words split into
+    // ≤4-char pieces, punctuation stands alone, "_" marks a leading space.
+    const tokenize = (text: string): string[] => {
+      const tokens: string[] = [];
+      const words = text.trim().split(/\s+/).filter(Boolean);
+      words.forEach((word, w) => {
+        const parts = word.match(/[\p{L}\p{N}]+|[^\p{L}\p{N}]/gu) ?? [word];
+        let firstPiece = true;
+        for (const part of parts) {
+          const pieces = part.length <= 4 ? [part] : (part.match(/.{1,4}/g) ?? [part]);
+          for (const piece of pieces) {
+            tokens.push((firstPiece && w > 0 ? '_' : '') + piece);
+            firstPiece = false;
+          }
+        }
+      });
+      return tokens;
+    };
+
+    const render = () => {
+      const tokens = tokenize(input.value);
+      chipsEl.textContent = '';
+      tokens.slice(0, MAX_CHIPS).forEach((tok, i) => {
+        const chip = document.createElement('span');
+        chip.className = 's31__chip';
+        chip.dataset.hue = String(i % 5);
+        chip.textContent = tok;
+        chipsEl.appendChild(chip);
+      });
+      if (tokens.length > MAX_CHIPS) {
+        const more = document.createElement('span');
+        more.className = 's31__hint';
+        more.textContent = `+${tokens.length - MAX_CHIPS} more`;
+        chipsEl.appendChild(more);
+      }
+      countEl.textContent = String(tokens.length);
+      costEl.textContent = `$${(tokens.length * SESSION_TURNS * OPUS_INPUT_PER_TOKEN).toFixed(4)}`;
+    };
+
+    input.addEventListener('input', render);
+  }
+</script>

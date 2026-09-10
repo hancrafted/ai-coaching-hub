@@ -2,13 +2,14 @@
   "name": "starlight-presentation-prototype",
   "private": true,
   "type": "module",
-  "//": "THROWAWAY PROTOTYPE \u2014 see prototype/starlight-presentation/README.md",
+  "//": "THROWAWAY PROTOTYPE 2 \u2014 see prototype/starlight-presentation/README.md",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/verify-isolation.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "build:pages": "PROTOTYPE_BASE=/ai-coaching-hub astro build"
+    "build:pages": "PROTOTYPE_BASE=/ai-coaching-hub astro build && node scripts/verify-isolation.mjs",
+    "verify:isolation": "node scripts/verify-isolation.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.0",

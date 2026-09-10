@@ -1,0 +1,268 @@
+---
+// S3.2 — a recreated `claude-code /context` readout. The 10×10 block pattern,
+// the glyph map and the sweep timings are ported verbatim from
+// presentation.js:s3-2. Grid cells are built at runtime, so their classes are
+// :global (same Astro scoping constraint as S3.1).
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Panel from '../primitives/Panel.astro';
+
+const CATS = [
+  { glyph: '⛁', name: 'System prompt', v: '9.4k · 4.7%', hue: 'info' },
+  { glyph: '⛁', name: 'System tools', v: '42.9k · 21.5%', hue: 'primary' },
+  { glyph: '⛁', name: 'MCP tools', v: '3.9k · 2.0%', hue: 'accent' },
+  { glyph: '⛀', name: 'Custom agents', v: '703 · 0.4%', hue: 'muted' },
+  { glyph: '⛀', name: 'Memory files', v: '407 · 0.2%', hue: 'muted' },
+  { glyph: '⛁', name: 'Skills', v: '2.2k · 1.1%', hue: 'error' },
+  { glyph: '⛁', name: 'Messages', v: '20.0k · 10.0%', hue: 'warning' },
+  { glyph: '⛶', name: 'Free space', v: '87.5k · 43.7%', hue: 'free' },
+  { glyph: '⛝', name: 'Autocompact buffer', v: '33k · 16.5%', hue: 'buffer' },
+];
+---
+
+<div class="s32">
+  <BeatHeader code="S3.2" section="What Is a Token">
+    <h2 class="s32__h">Most tools hide the meter — <em>this is what seeing it looks like.</em></h2>
+  </BeatHeader>
+
+  <p class="s32__lede">
+    You don't need to know the exact token usage of every request. You should develop a sense of
+    how many tokens a task requires, ideally based on which model you are planning to use.
+  </p>
+
+  <Panel class="s32__term">
+    <p class="s32__termbar">claude-code — /context</p>
+    <p class="s32__cmd">$ /context</p>
+    <p class="s32__model">Sonnet 5 <span>claude-sonnet-5</span></p>
+    <p class="s32__usage">
+      <span class="s3-2-tokens">0.0k</span>/200k tokens (<span class="s3-2-pct">0</span>%)
+    </p>
+
+    <div class="s32__body">
+      <div class="s3-2-grid s32__grid" aria-hidden="true"></div>
+      <div class="s32__legend">
+        <p class="s32__legend-h">Estimated usage by category</p>
+        <ul>
+          {CATS.map((c) => (
+            <li class="s3-2-cat s32__cat">
+              <span class="s32__glyph" data-hue={c.hue}>{c.glyph}</span>
+              <span class="s32__cname">{c.name}</span>
+              <span class="s32__cv">{c.v}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Panel>
+
+  <p class="s32__note">
+    Recreated from a real Claude Code <code>/context</code> readout — run it in any session to see
+    your own.
+  </p>
+</div>
+
+<style>
+  .s32__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .s32__h em {
+    font-style: normal;
+    color: var(--k-accent-high);
+  }
+  .s32__lede {
+    margin-block: 1.25rem 1.5rem;
+    color: var(--k-fg-muted);
+    line-height: 1.7;
+    max-width: 62ch;
+  }
+  .s32__term {
+    font-family: var(--k-font-mono);
+  }
+  .s32__termbar {
+    margin: -0.25rem 0 0.75rem;
+    padding-block-end: 0.5rem;
+    border-block-end: 1px solid var(--k-border);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+  }
+  .s32__cmd {
+    margin: 0;
+    color: var(--k-solved);
+  }
+  .s32__model {
+    margin: 0.5rem 0 0;
+    font-weight: 700;
+  }
+  .s32__model span {
+    font-weight: 400;
+    color: var(--k-fg-subtle);
+    margin-inline-start: 0.5rem;
+  }
+  .s32__usage {
+    margin: 0.2rem 0 1rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--k-warn);
+  }
+  .s32__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .s32__grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 1px;
+    font-size: 0.95rem;
+    line-height: 1;
+    height: fit-content;
+  }
+  .s32__legend {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+  .s32__legend-h {
+    margin: 0 0 0.5rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+  }
+  .s32__legend ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--k-text-xs);
+  }
+  .s32__cat {
+    display: flex;
+    gap: 0.5rem;
+    padding-block: 0.15rem;
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+  .s32__cat.is-shown {
+    opacity: 1;
+  }
+  .s32__cname {
+    flex: 1;
+    color: var(--k-fg-muted);
+  }
+  .s32__cv {
+    font-variant-numeric: tabular-nums;
+    color: var(--k-fg-subtle);
+  }
+  /* Hue map, shared by the legend glyphs and the runtime-built grid cells.
+     :global for the same reason as S3.1 — the grid is created in JS. */
+  :global(.s32__glyph[data-hue='info']),
+  :global(.s32-cell[data-hue='info']) { color: var(--k-split); }
+  :global(.s32__glyph[data-hue='primary']),
+  :global(.s32-cell[data-hue='primary']) { color: var(--k-accent); }
+  :global(.s32__glyph[data-hue='accent']),
+  :global(.s32-cell[data-hue='accent']) { color: var(--k-accent-high); }
+  :global(.s32__glyph[data-hue='muted']),
+  :global(.s32-cell[data-hue='muted']) { color: var(--k-fg-faint); }
+  :global(.s32__glyph[data-hue='error']),
+  :global(.s32-cell[data-hue='error']) { color: var(--k-amplified); }
+  :global(.s32__glyph[data-hue='warning']),
+  :global(.s32-cell[data-hue='warning']) { color: var(--k-holding); }
+  :global(.s32__glyph[data-hue='free']),
+  :global(.s32-cell[data-hue='free']) { color: color-mix(in oklab, var(--k-fg-faint) 45%, transparent); }
+  :global(.s32__glyph[data-hue='buffer']),
+  :global(.s32-cell[data-hue='buffer']) { color: color-mix(in oklab, var(--k-holding) 60%, transparent); }
+  :global(.s32-cell) {
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+  :global(.s32-cell.is-shown) {
+    opacity: 1;
+  }
+  .s32__note {
+    margin-block-start: 1rem;
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s32__cat,
+    :global(.s32-cell) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+
+  registerActivate('s3-2', (reduced) => {
+    const container = document.getElementById('s3-2');
+    if (!container) return;
+    const gridEl = container.querySelector<HTMLElement>('.s3-2-grid');
+    const tokensEl = container.querySelector('.s3-2-tokens');
+    const pctEl = container.querySelector('.s3-2-pct');
+    const cats = container.querySelectorAll('.s3-2-cat');
+
+    // Exact block pattern from a real /context (10x10): each letter = a category.
+    // S=System prompt, T=System tools, M=MCP tools, A=small cats, K=Skills,
+    // G=Messages, E=free ⛶, B=autocompact buffer ⛝.
+    const PATTERN = [
+      'SSSSSTTTTT',
+      'TTTTTTTTTT',
+      'TTTTTTMMKA',
+      'GGGGGGGGGG',
+      'EEEEEEEEEE',
+      'EEEEEEEEEE',
+      'EEEEEEEEEE',
+      'EEEEEEEEEE',
+      'EEEBBBBBBB',
+      'BBBBBBBBBB',
+    ].join('');
+    const GLYPH: Record<string, string> = { S: '⛁', T: '⛁', M: '⛁', A: '⛀', K: '⛁', G: '⛁', E: '⛶', B: '⛝' };
+    const HUE: Record<string, string> = { S: 'info', T: 'primary', M: 'accent', A: 'muted', K: 'error', G: 'warning', E: 'free', B: 'buffer' };
+
+    let cells: HTMLElement[] = [];
+    if (gridEl && !gridEl.dataset.built) {
+      for (const ch of PATTERN) {
+        const s = document.createElement('span');
+        s.textContent = GLYPH[ch];
+        s.className = 's32-cell';
+        s.dataset.hue = HUE[ch];
+        gridEl.appendChild(s);
+        cells.push(s);
+      }
+      gridEl.dataset.built = '1';
+    } else if (gridEl) {
+      cells = Array.from(gridEl.querySelectorAll('span'));
+    }
+
+    const targetTokens = 79.5;
+    const targetPct = 40;
+    const fmtK = (v: number) => `${v.toFixed(1)}k`;
+
+    if (reduced) {
+      for (const c of cells) c.classList.add('is-shown');
+      for (const c of cats) c.classList.add('is-shown');
+      if (tokensEl) tokensEl.textContent = fmtK(targetTokens);
+      if (pctEl) pctEl.textContent = String(targetPct);
+      return;
+    }
+
+    cells.forEach((c, i) => window.setTimeout(() => c.classList.add('is-shown'), i * 12));
+
+    const duration = Math.max(cells.length * 12, 900);
+    let start: number | null = null;
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      if (tokensEl) tokensEl.textContent = fmtK(eased * targetTokens);
+      if (pctEl) pctEl.textContent = String(Math.round(eased * targetPct));
+      if (p < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+
+    cats.forEach((c, i) => window.setTimeout(() => c.classList.add('is-shown'), 300 + i * 110));
+  });
+</script>

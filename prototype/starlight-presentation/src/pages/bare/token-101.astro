@@ -1,0 +1,40 @@
+---
+// Module 2 on the BARE tree. Same kit content, no Starlight. The tower owns the
+// page scroller here, so scroll-snap is on — which it cannot be on the
+// Starlight side. That difference is the finding.
+import BareLayout from '../../layouts/BareLayout.astro';
+import TowerToc from '../../kit/tower/TowerToc.astro';
+import TokenTower from '../../kit/tower/TokenTower.astro';
+import { TOKEN_101_MODULE as M } from '../../modules';
+---
+
+<BareLayout title={M.title} description={M.description} route="token-101" fullBleed>
+  <div class="t101">
+    <aside class="t101__rail"><TowerToc /></aside>
+    <TokenTower snap={true} />
+  </div>
+</BareLayout>
+
+<style>
+  .t101 {
+    display: grid;
+  }
+  @media (min-width: 64rem) {
+    .t101 {
+      grid-template-columns: 19rem minmax(0, 1fr);
+      align-items: start;
+    }
+    .t101__rail {
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+      overflow-y: auto;
+      border-inline-end: 1px solid var(--k-border);
+    }
+  }
+  @media (max-width: 63.99rem) {
+    .t101__rail {
+      border-block-end: 1px solid var(--k-border);
+    }
+  }
+</style>

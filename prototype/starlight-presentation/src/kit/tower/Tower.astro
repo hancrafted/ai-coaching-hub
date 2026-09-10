@@ -1,0 +1,31 @@
+---
+// The scroll tower container. `snap` is a prop because the harvest assumed it
+// owned the page scroller (`#tower { overflow-y: auto }` filling the viewport);
+// on the Starlight tree it does not, so the shell decides.
+interface Props {
+  snap?: boolean;
+}
+const { snap = true } = Astro.props;
+---
+
+<main id="tower" class="tower" data-snap={snap ? '' : undefined}>
+  <slot />
+</main>
+
+<style>
+  .tower {
+    min-height: 0;
+    flex: 1;
+  }
+  .tower[data-snap] {
+    scroll-snap-type: y proximity;
+  }
+</style>
+
+<script>
+  import { init } from './engine';
+  // Marks the tower as JS-driven so beats may start hidden (see Beat.astro),
+  // then hands off to the ported engine.
+  document.getElementById('tower')?.classList.add('is-js');
+  init();
+</script>

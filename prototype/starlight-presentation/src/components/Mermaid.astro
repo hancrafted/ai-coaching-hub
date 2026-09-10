@@ -35,17 +35,17 @@ const { code, caption, alt } = Astro.props;
       startOnLoad: false,
       securityLevel: 'strict',
       theme: isDark() ? 'dark' : 'default',
-      fontFamily: token('--sl-font', 'system-ui, sans-serif'),
+      fontFamily: token('--k-font', 'system-ui, sans-serif'),
       themeVariables: {
-        primaryColor: token('--sl-color-gray-6', '#e5e7eb'),
-        primaryTextColor: token('--sl-color-white', '#111'),
-        primaryBorderColor: token('--sl-color-gray-4', '#9ca3af'),
-        lineColor: token('--sl-color-gray-3', '#6b7280'),
+        primaryColor: token('--k-surface', '#e5e7eb'),
+        primaryTextColor: token('--k-fg', '#111'),
+        primaryBorderColor: token('--k-fg-faint', '#9ca3af'),
+        lineColor: token('--k-fg-subtle', '#6b7280'),
         fontSize: '15px',
         // Mermaid's default cluster fill is a hard yellow that fights every
         // Starlight palette. Transparent works in both themes.
         clusterBkg: 'transparent',
-        clusterBorder: token('--sl-color-gray-4', '#9ca3af'),
+        clusterBorder: token('--k-fg-faint', '#9ca3af'),
       },
       flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: true },
       gantt: { useMaxWidth: true, barHeight: 18, fontSize: 12 },

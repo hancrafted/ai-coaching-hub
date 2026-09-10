@@ -217,10 +217,10 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     top: 1rem;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1px solid var(--k-border);
     border-radius: 0.5rem;
     padding: 0.75rem 1rem;
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
   }
   @media (max-width: 68rem) {
     .vc__ledger {
@@ -230,15 +230,15 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     }
   }
   .vc__ledger-title {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--sl-color-accent-high);
+    color: var(--k-accent-high);
     font-weight: 700;
     margin: 0;
   }
   .vc__ledger-note {
-    color: var(--sl-color-gray-3);
+    color: var(--k-fg-subtle);
     margin: 0.2rem 0 0.75rem;
   }
   .vc__ledger-group {
@@ -251,7 +251,7 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     list-style: none;
     margin: 0;
     padding: 0 0 0 0.25rem;
-    border-inline-start: 1px solid var(--sl-color-gray-6);
+    border-inline-start: 1px solid var(--k-surface);
   }
   .vc__ledger li {
     margin-block: 0.3rem;
@@ -259,21 +259,21 @@ const bySource = Object.keys(SOURCES).map((id) => ({
   }
   .vc__ledger a {
     text-decoration: none;
-    color: var(--sl-color-gray-2);
+    color: var(--k-fg-muted);
     line-height: 1.4;
     display: block;
   }
   .vc__ledger a:hover {
-    color: var(--sl-color-white);
+    color: var(--k-fg);
   }
   .vc__uncited {
-    color: var(--p-amplified);
+    color: var(--k-amplified);
     font-style: italic;
     padding-inline-start: 0.5rem;
   }
   .vc__num {
-    font-family: var(--sl-font-mono);
-    color: var(--sl-color-accent-high);
+    font-family: var(--k-font-mono);
+    color: var(--k-accent-high);
     margin-inline-end: 0.35rem;
   }
 
@@ -282,21 +282,21 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     min-width: 0;
   }
   .vc__kicker {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--sl-color-accent-high);
+    color: var(--k-accent-high);
     margin: 0;
   }
   .vc__head h1 {
-    font-size: var(--sl-text-3xl);
+    font-size: var(--k-text-3xl);
     margin: 0.2rem 0 0.5rem;
   }
   .vc__claim {
-    font-size: var(--sl-text-xl);
+    font-size: var(--k-text-xl);
     line-height: 1.45;
     font-weight: 600;
-    border-inline-start: 4px solid var(--sl-color-accent);
+    border-inline-start: 4px solid var(--k-accent);
     padding-inline-start: 1rem;
   }
 
@@ -307,22 +307,22 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     gap: 0.75rem;
   }
   .vc__card {
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1px solid var(--k-border);
     border-radius: 0.5rem;
     padding: 0.75rem 1rem 1rem;
     border-inline-start-width: 4px;
   }
   .vc__card[data-verdict='Solved'] {
-    border-inline-start-color: var(--p-solved);
+    border-inline-start-color: var(--k-solved);
   }
   .vc__card[data-verdict='Holding'] {
-    border-inline-start-color: var(--p-holding);
+    border-inline-start-color: var(--k-holding);
   }
   .vc__card[data-verdict='Split'] {
-    border-inline-start-color: var(--p-split);
+    border-inline-start-color: var(--k-split);
   }
   .vc__card[data-verdict='Amplified'] {
-    border-inline-start-color: var(--p-amplified);
+    border-inline-start-color: var(--k-amplified);
   }
   .vc__card-top {
     display: flex;
@@ -331,26 +331,26 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     margin: 0;
   }
   .vc__card h3 {
-    font-size: var(--sl-text-base);
+    font-size: var(--k-text-base);
     margin: 0.4rem 0 0.1rem;
   }
   .vc__gloss {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
     margin: 0 0 0.5rem;
   }
   .vc__ba {
     margin: 0;
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.15rem 0.6rem;
   }
   .vc__ba dt {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--sl-color-gray-4);
+    color: var(--k-fg-faint);
     padding-block-start: 0.15rem;
   }
   .vc__ba dd {
@@ -363,16 +363,16 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     scroll-margin-top: 1rem;
   }
   .vc__ev h3 {
-    font-size: var(--sl-text-lg);
+    font-size: var(--k-text-lg);
   }
   .vc__so {
-    border-inline-start: 3px solid var(--sl-color-accent);
+    border-inline-start: 3px solid var(--k-accent);
     padding: 0.4rem 0 0.4rem 1rem;
     font-weight: 600;
   }
   .vc__hint {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
   }
 
   .vc__corrections {
@@ -380,14 +380,14 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     padding: 0;
   }
   .vc__corrections li {
-    border-inline-start: 3px solid var(--p-amplified);
+    border-inline-start: 3px solid var(--k-amplified);
     padding-inline-start: 1rem;
     margin-block: 1rem;
   }
   .vc__struck {
     text-decoration: line-through;
     text-decoration-thickness: 2px;
-    color: var(--sl-color-gray-3);
+    color: var(--k-fg-subtle);
     font-weight: 600;
     margin: 0;
   }
@@ -395,12 +395,12 @@ const bySource = Object.keys(SOURCES).map((id) => ({
     margin: 0.25rem 0;
   }
   .vc__detail {
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     line-height: 1.55;
     margin: 0;
   }
   .vc__gaps {
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     line-height: 1.6;
   }
 </style>

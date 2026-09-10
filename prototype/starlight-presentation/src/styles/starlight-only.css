@@ -1,0 +1,13 @@
+/* STARLIGHT-ONLY overrides — reaches into Starlight's own layout classes, so it
+ * is meaningless on the bare tree and stays out of it. Loaded via `customCss`.
+ */
+
+/* The prototype route asks for the whole canvas. Scoped with :has() so the
+   control page keeps Starlight's normal reading measure. */
+body:has(.pfull) .sl-container,
+body:has(.pfull) .sl-markdown-content {
+  max-width: none;
+}
+body:has(.pfull) main {
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}

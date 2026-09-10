@@ -1,0 +1,34 @@
+---
+// Absorbs `.pchip`, hand-written inline ~13× in prototype 1 (including inside
+// raw strings passed to set:html), plus daisyUI `badge` ×90 from the harvest.
+interface Props {
+  mono?: boolean;
+  tone?: 'neutral' | 'accent' | 'warn';
+}
+const { mono = true, tone = 'neutral' } = Astro.props;
+---
+
+<span class="k-chip" data-mono={mono ? '' : undefined} data-tone={tone}><slot /></span>
+
+<style>
+  .k-chip {
+    display: inline-block;
+    font-size: 0.75rem;
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-sm);
+    padding: 0 0.35rem;
+    color: var(--k-fg-muted);
+    white-space: nowrap;
+  }
+  .k-chip[data-mono] {
+    font-family: var(--k-font-mono);
+  }
+  .k-chip[data-tone='accent'] {
+    color: var(--k-accent-high);
+    border-color: color-mix(in oklab, var(--k-accent) 50%, transparent);
+  }
+  .k-chip[data-tone='warn'] {
+    color: var(--k-warn-high);
+    border-color: color-mix(in oklab, var(--k-warn) 50%, transparent);
+  }
+</style>

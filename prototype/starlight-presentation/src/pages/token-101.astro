@@ -1,0 +1,67 @@
+---
+// Module 2 on the STARLIGHT tree. Thin by design — everything below the shell
+// comes from the kit, identical to /bare/token-101.
+//
+// Starlight features disabled here, counted on /findings:
+//   template: 'splash'   → no sidebar, no built-in TOC (the tower owns its own)
+//   tableOfContents: false
+//   hasSidebar: false
+// Pagefind stays ON: unlike module 1's three variants, this page is one
+// document, so indexing it is honest.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import PrototypeBanner from '../components/PrototypeBanner.astro';
+import StackBar from '../components/StackBar.astro';
+import TowerToc from '../kit/tower/TowerToc.astro';
+import TokenTower from '../kit/tower/TokenTower.astro';
+import { TOKEN_101_MODULE as M } from '../modules';
+import '../kit/animation.css';
+---
+
+<StarlightPage
+  frontmatter={{
+    title: M.title,
+    description: M.description,
+    template: 'splash',
+    tableOfContents: false,
+  }}
+  hasSidebar={false}
+>
+  <div class="pfull">
+    <StackBar route="token-101" stack="starlight" />
+    <PrototypeBanner
+      repo={M.origin.repo}
+      path={M.origin.path}
+      note="Harvested from a Vite + daisyUI page and rewritten onto the kit."
+    />
+    <div class="t101">
+      <aside class="t101__rail"><TowerToc /></aside>
+      <TokenTower snap={false} />
+    </div>
+  </div>
+</StarlightPage>
+
+<style>
+  .t101 {
+    display: grid;
+    gap: 0;
+  }
+  @media (min-width: 64rem) {
+    .t101 {
+      grid-template-columns: 19rem minmax(0, 1fr);
+      align-items: start;
+    }
+    .t101__rail {
+      position: sticky;
+      top: 1rem;
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+      border-inline-end: 1px solid var(--k-border);
+    }
+  }
+  @media (max-width: 63.99rem) {
+    .t101__rail {
+      border-block-end: 1px solid var(--k-border);
+      margin-block-end: 1rem;
+    }
+  }
+</style>

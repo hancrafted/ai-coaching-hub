@@ -1,0 +1,48 @@
+---
+// `.vb__kicker:169` and `.vc__kicker:284` were byte-identical; `.va__occasion`
+// and `.vb__occasion` differed by 0.1rem. Also absorbs the harvest's eyebrow
+// micro-typography, which was duplicated across both coaching-content pages.
+interface Props {
+  kicker?: string;
+  title: string;
+  occasion?: string;
+  lede?: string;
+  level?: 'h1' | 'h2';
+}
+const { kicker, title, occasion, lede, level = 'h1' } = Astro.props;
+const Heading = level;
+---
+
+<header class="k-head">
+  {kicker && <p class="k-head__kicker">{kicker}</p>}
+  <Heading class="k-head__title">{title}</Heading>
+  {occasion && <p class="k-head__occasion">{occasion}</p>}
+  {lede && <p class="k-head__lede">{lede}</p>}
+  <slot />
+</header>
+
+<style>
+  .k-head__kicker {
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--k-accent-high);
+    margin: 0;
+  }
+  .k-head__title {
+    font-size: var(--k-text-3xl);
+    line-height: var(--k-line-tight);
+    margin: 0.2rem 0 0;
+  }
+  .k-head__occasion {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
+    margin: 0.4rem 0 0;
+  }
+  .k-head__lede {
+    font-size: var(--k-text-lg);
+    line-height: 1.6;
+    color: var(--k-fg-muted);
+  }
+</style>

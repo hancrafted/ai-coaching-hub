@@ -1,0 +1,25 @@
+---
+// `<sup><a href="#sources">[n]</a></sup>`, used ~20× across the harvest.
+// The href is base-aware: on the Starlight tree the sources list lives on the
+// same page, so a bare fragment is correct — but the component still takes the
+// full href so a shell can point it elsewhere.
+interface Props {
+  n: number | number[];
+  href?: string;
+}
+const { n, href = '#sources' } = Astro.props;
+const refs = Array.isArray(n) ? n : [n];
+---
+
+<sup class="k-cite">{refs.map((r) => <a href={href}>[{r}]</a>)}</sup>
+
+<style>
+  .k-cite a {
+    font-family: var(--k-font-mono);
+    color: color-mix(in oklab, var(--k-accent) 70%, transparent);
+    text-decoration: none;
+  }
+  .k-cite a:hover {
+    color: var(--k-accent);
+  }
+</style>

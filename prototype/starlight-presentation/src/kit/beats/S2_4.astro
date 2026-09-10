@@ -1,0 +1,189 @@
+---
+// S2.4 — a signed invoice beside an unsigned drip of prompts, same total.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Panel from '../primitives/Panel.astro';
+
+const LINES = [
+  { label: 'Slide design & layout', amount: '€1,800' },
+  { label: 'Hand-aligned every element', amount: '€900' },
+  { label: 'Two rounds of revisions', amount: '€500' },
+];
+const DRIPS = ['+€0.80', '+€1.20', '+€0.60', '+€2.10', '+€0.90'];
+---
+
+<div class="s24">
+  <BeatHeader code="S2.4" section="Motivation">
+    <h2 class="s24__h">
+      For a real freelancer you need a business case. <em>AI just bills you.</em>
+    </h2>
+  </BeatHeader>
+
+  <div class="s24__cols">
+    <Panel>
+      <div class="s24__ihead">
+        <span class="s24__ilabel">Freelancer · Invoice #0042</span>
+        <span class="s24__ok">approved</span>
+      </div>
+      <ul class="s24__lines">
+        {LINES.map((l) => <li><span>{l.label}</span><span class="s24__amt">{l.amount}</span></li>)}
+      </ul>
+      <p class="s24__total"><span>Total</span><span class="s24__amt">€3,200</span></p>
+      <p class="s24__sig">signed · Finance</p>
+    </Panel>
+
+    <Panel>
+      <div class="s24__ihead">
+        <span class="s24__ilabel">AI · no invoice</span>
+        <span class="s24__never">never quoted</span>
+      </div>
+      <ul class="s24__drips">
+        {DRIPS.map((d) => <li data-drip class="s24__drip">{d}</li>)}
+        <li class="s24__more">+ …hundreds more</li>
+      </ul>
+      <p class="s24__total">
+        <span>Same total</span>
+        <span class="s24__amt">€<span id="s24-total">0</span></span>
+      </p>
+      <p class="s24__note">~3,000 prompts · ~€1 at a time</p>
+      <p class="s24__sig s24__sig--none">no signature</p>
+    </Panel>
+  </div>
+
+  <p class="s24__foot">Everyone is figuring out the costs to benefit ratio as of now.</p>
+</div>
+
+<style>
+  .s24__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    max-width: 44ch;
+  }
+  .s24__h em {
+    font-style: normal;
+    color: var(--k-amplified);
+  }
+  .s24__cols {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+  .s24__ihead {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    align-items: baseline;
+    border-block-end: 1px solid var(--k-border);
+    padding-block-end: 0.5rem;
+  }
+  .s24__ilabel {
+    font-family: var(--k-font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-fg-subtle);
+  }
+  .s24__ok {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--k-solved);
+  }
+  .s24__never {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--k-amplified);
+  }
+  .s24__lines,
+  .s24__drips {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+  }
+  .s24__lines li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.35rem;
+    line-height: 1.4;
+  }
+  .s24__amt {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .s24__drips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .s24__drip {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    border: 1px solid color-mix(in oklab, var(--k-amplified) 40%, transparent);
+    border-radius: var(--k-radius-sm);
+    padding: 0.1rem 0.4rem;
+    color: var(--k-amplified);
+    opacity: 0;
+    transition: opacity 400ms;
+  }
+  .s24__drip.is-shown {
+    opacity: 1;
+  }
+  .s24__more {
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+    align-self: center;
+  }
+  .s24__total {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block-start: 1rem;
+    border-block-start: 1px solid var(--k-border);
+    padding-block-start: 0.6rem;
+    font-weight: 700;
+  }
+  .s24__note {
+    margin: 0.4rem 0 0;
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .s24__sig {
+    margin: 0.75rem 0 0;
+    font-family: var(--k-font-mono);
+    font-size: 0.65rem;
+    color: var(--k-solved);
+  }
+  .s24__sig--none {
+    color: var(--k-amplified);
+  }
+  .s24__foot {
+    margin-block-start: 1.5rem;
+    color: var(--k-fg-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s24__drip {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp } from '../format';
+  registerActivate('s2-4', (reduced) => {
+    const total = document.getElementById('s24-total');
+    const drips = document.querySelectorAll('#s2-4 [data-drip]');
+    if (reduced) {
+      if (total) total.textContent = '3,200';
+      drips.forEach((el) => el.classList.add('is-shown'));
+      return;
+    }
+    drips.forEach((el, i) => window.setTimeout(() => el.classList.add('is-shown'), 200 + i * 160));
+    if (total) countUp(total, 3200, { duration: 1600 });
+  });
+</script>

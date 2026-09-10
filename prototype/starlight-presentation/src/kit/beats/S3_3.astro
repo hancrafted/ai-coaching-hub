@@ -1,0 +1,161 @@
+---
+// S3.3 — the hypothesis: the meter is hidden on purpose.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+import Panel from '../primitives/Panel.astro';
+const comic = `${import.meta.env.BASE_URL}token-101/token-additction.webp`.replace(/\/{2,}/g, '/');
+
+const STEPS = [
+  { n: '01', t: 'The initiation', b: 'Unlimited, on the house. The intelligence feels like magic and the bill is invisible — so you build the habit.' },
+  { n: '02', t: 'The hook', b: "Now you're fluent — and the meter's gone. Out of credits? Just top up. The number you'd need to push back never shows." },
+];
+---
+
+<div class="s33">
+  <BeatHeader code="S3.3" section="What Is a Token">
+    <p class="s33__caveat">A hypothesis — not an accusation</p>
+    <h2 class="s33__h">The meter is <em>hidden on purpose.</em></h2>
+  </BeatHeader>
+
+  <p class="s33__lede">
+    Follow the incentive. A vendor earns more every time you reach for a bigger model and burn more
+    tokens — and the biggest vendors currently sell below cost to build the habit<Cite
+      n={[10, 11]}
+    />. So the first taste is generous and the cost is abstracted away behind credits, vague
+    limits, and a spinner where a number should be. You can't manage what you can't see. That's the
+    hook.
+  </p>
+
+  <figure class="s3-3-comic s33__comic">
+    <img src={comic} alt="" />
+    <figcaption>The initiation, then the hook — how metered dependencies get built.</figcaption>
+  </figure>
+
+  <div class="s33__steps">
+    {
+      STEPS.map((s) => (
+        <div class="s3-3-card">
+          <Panel>
+            <h3 class="s33__sh"><span class="s33__sn">{s.n}</span> {s.t}</h3>
+            <p class="s33__sb">{s.b}</p>
+          </Panel>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="s33__kicker">
+    This is why the CLI meter matters: it's the one place the number is right in front of you — the
+    same <code>/context</code> you just saw.
+  </p>
+</div>
+
+<style>
+  .s33__caveat {
+    margin: 0 0 0.5rem;
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--k-holding);
+  }
+  .s33__h {
+    font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl));
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .s33__h em {
+    font-style: normal;
+    color: var(--k-amplified);
+  }
+  .s33__lede {
+    margin-block: 1.25rem 1.5rem;
+    color: var(--k-fg-muted);
+    line-height: 1.7;
+    max-width: 64ch;
+  }
+  .s33__comic {
+    margin: 0 0 1.5rem;
+    opacity: 0;
+    scale: 0.95;
+    transition:
+      opacity 500ms ease-out,
+      scale 500ms ease-out;
+  }
+  .s33__comic.is-shown {
+    opacity: 1;
+    scale: 1;
+  }
+  .s33__comic img {
+    width: 100%;
+    max-width: 34rem;
+    border-radius: var(--k-radius);
+    border: 1px solid var(--k-border);
+  }
+  .s33__comic figcaption {
+    margin-block-start: 0.5rem;
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .s33__steps {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+  .s3-3-card {
+    opacity: 0;
+    translate: 0 1rem;
+    transition:
+      opacity 500ms ease-out,
+      translate 500ms ease-out;
+  }
+  .s3-3-card.is-shown {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .s33__sh {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: var(--k-text-lg);
+    margin: 0 0 0.5rem;
+  }
+  .s33__sn {
+    font-family: var(--k-font-mono);
+    color: var(--k-amplified);
+  }
+  .s33__sb {
+    margin: 0;
+    color: var(--k-fg-muted);
+    line-height: 1.6;
+  }
+  .s33__kicker {
+    margin-block-start: 1.5rem;
+    font-weight: 600;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s33__comic,
+    .s3-3-card {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  registerActivate('s3-3', (reduced) => {
+    const container = document.getElementById('s3-3');
+    if (!container) return;
+    const comic = container.querySelector('.s3-3-comic');
+    const cards = container.querySelectorAll('.s3-3-card');
+    const reveal = (el: Element | null) => el?.classList.add('is-shown');
+    if (reduced) {
+      reveal(comic);
+      cards.forEach(reveal);
+      return;
+    }
+    window.setTimeout(() => reveal(comic), 150);
+    cards.forEach((c, i) => window.setTimeout(() => reveal(c), 700 + i * 250));
+  });
+</script>

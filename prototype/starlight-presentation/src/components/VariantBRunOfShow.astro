@@ -163,24 +163,24 @@ const total = elapsed;
     gap: 1rem;
     justify-content: space-between;
     align-items: flex-end;
-    border-block-end: 2px solid var(--sl-color-gray-5);
+    border-block-end: 2px solid var(--k-border);
     padding-block-end: 0.75rem;
   }
   .vb__kicker {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--sl-color-accent-high);
+    color: var(--k-accent-high);
     margin: 0;
   }
   .vb__head h1 {
-    font-size: var(--sl-text-3xl);
+    font-size: var(--k-text-3xl);
     margin: 0.2rem 0 0;
   }
   .vb__occasion {
-    font-family: var(--sl-font-mono);
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
     margin: 0.3rem 0 0;
   }
   .vb__clock {
@@ -189,14 +189,14 @@ const total = elapsed;
     flex-direction: column;
   }
   .vb__clock-big {
-    font-family: var(--sl-font-mono);
-    font-size: var(--sl-text-4xl);
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-4xl);
     font-weight: 700;
     line-height: 1;
   }
   .vb__clock-note {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
   }
 
   .vb__charts {
@@ -212,54 +212,54 @@ const total = elapsed;
   }
 
   .vb__hint {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
   }
 
   /* --- the timing table IS this variant's table of contents --- */
   .vb__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     display: table;
   }
   .vb__table th {
     text-align: start;
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--sl-color-gray-3);
-    border-block-end: 1px solid var(--sl-color-gray-5);
+    color: var(--k-fg-subtle);
+    border-block-end: 1px solid var(--k-border);
     padding: 0.4rem 0.5rem;
     position: sticky;
     top: 0;
-    background: var(--sl-color-bg);
+    background: var(--k-bg);
     z-index: 1;
   }
   .vb__table td {
     padding: 0.45rem 0.5rem;
-    border-block-end: 1px solid var(--sl-color-gray-6);
+    border-block-end: 1px solid var(--k-surface);
     vertical-align: top;
   }
   .vb__row--sectionstart td {
-    border-block-start: 2px solid var(--sl-color-gray-5);
+    border-block-start: 2px solid var(--k-border);
   }
   .vb__at,
   .vb__len,
   .vb__num {
-    font-family: var(--sl-font-mono);
+    font-family: var(--k-font-mono);
     white-space: nowrap;
   }
   .vb__at {
-    color: var(--sl-color-accent-high);
+    color: var(--k-accent-high);
     font-weight: 700;
   }
   .vb__len,
   .vb__num {
-    color: var(--sl-color-gray-3);
+    color: var(--k-fg-subtle);
   }
   .vb__thesis {
-    color: var(--sl-color-gray-2);
+    color: var(--k-fg-muted);
     line-height: 1.45;
   }
   .vb__cutrank {
@@ -267,9 +267,9 @@ const total = elapsed;
     min-width: 1.6rem;
     text-align: center;
     border-radius: 0.25rem;
-    background: color-mix(in oklab, var(--p-holding) 22%, transparent);
-    color: var(--p-holding);
-    border: 1px solid var(--p-holding);
+    background: color-mix(in oklab, var(--k-holding) 22%, transparent);
+    color: var(--k-holding);
+    border: 1px solid var(--k-holding);
     font-weight: 700;
     cursor: help;
   }
@@ -285,24 +285,24 @@ const total = elapsed;
     display: inline-block;
     border-radius: 0.25rem;
     padding-inline: 0.35rem;
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--p-amplified);
-    border: 1px solid var(--p-amplified);
-    background: color-mix(in oklab, var(--p-amplified) 12%, transparent);
+    color: var(--k-amplified);
+    border: 1px solid var(--k-amplified);
+    background: color-mix(in oklab, var(--k-amplified) 12%, transparent);
     cursor: help;
   }
   .vb__nocut {
-    color: var(--sl-color-gray-4);
+    color: var(--k-fg-faint);
   }
   .vb__lastresort {
-    color: var(--p-amplified);
+    color: var(--k-amplified);
   }
   .vb__table tfoot td {
     font-weight: 700;
-    border-block-start: 2px solid var(--sl-color-gray-5);
+    border-block-start: 2px solid var(--k-border);
     border-block-end: 0;
   }
 
@@ -318,20 +318,20 @@ const total = elapsed;
     }
   }
   .vb__panel {
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1px solid var(--k-border);
     border-radius: 0.5rem;
     padding: 0.5rem 1rem 1rem;
   }
   .vb__panel h2 {
-    font-size: var(--sl-text-base);
+    font-size: var(--k-text-base);
     margin-block-start: 0.75rem;
   }
   .vb__panel--warn {
-    border-color: var(--p-amplified);
-    background: color-mix(in oklab, var(--p-amplified) 8%, transparent);
+    border-color: var(--k-amplified);
+    background: color-mix(in oklab, var(--k-amplified) 8%, transparent);
   }
   .vb__trim {
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     line-height: 1.5;
     padding-inline-start: 1.2rem;
   }
@@ -340,7 +340,7 @@ const total = elapsed;
   }
 
   .vb__details {
-    border-block-end: 1px solid var(--sl-color-gray-6);
+    border-block-end: 1px solid var(--k-surface);
     padding-block: 0.35rem;
     scroll-margin-top: 1rem;
   }
@@ -356,20 +356,20 @@ const total = elapsed;
   }
   .vb__dthesis {
     font-weight: 600;
-    border-inline-start: 3px solid var(--sl-color-accent);
+    border-inline-start: 3px solid var(--k-accent);
     padding-inline-start: 0.75rem;
   }
   .vb__details ul {
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     line-height: 1.55;
   }
   .vb__visual {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
   }
   .vb__details blockquote {
     font-style: italic;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-2);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-muted);
   }
 </style>

@@ -1,51 +1,33 @@
 ---
-// THROWAWAY PROTOTYPE — sub-shape B (a new route), because this repo has no
-// existing page for the variants to sit inside; there is no site yet at all.
+// THE HUB, ON THE STARLIGHT TREE.
 //
-// Three variants of the talk page on this one route, switchable via
-// `?variant=A|B|C`. Wrapped in <StarlightPage> so the variants are judged
-// against real Starlight chrome — header, search, theme toggle — rather than in
-// a vacuum. `template: splash` drops the sidebar and Starlight's own TOC so each
-// variant can own its full canvas, including its own table of contents.
+// Issue #4 claimed: "no built-in marketing top-nav — handled by component
+// overrides", with `src/pages/*.astro` as a LAST-RESORT escape hatch. The plan
+// for this prototype requires trying the sanctioned route first and recording
+// which one we actually land on.
+//
+// ATTEMPT 1 (what you are reading): `<StarlightPage template="splash">`. Verdict
+// recorded on /findings — in short, `splash` gets us a chrome-free canvas and
+// Starlight's header/search/theme-toggle stay intact, so NO `Header` or
+// `PageFrame` override was needed. `docs/research/starlight-and-stack.md:32`
+// flagged `PageFrame` overrides as "significant complexity"; we never reached
+// for one. But note what that cost: `hero` in frontmatter is NOT used, because
+// the harvested hub is an editorial single column, not a hero + card grid, and
+// Starlight's `hero` shape can't express it. So #4's claim half-survives.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import PrototypeBanner from '../components/PrototypeBanner.astro';
-import VariantAScript from '../components/VariantAScript.astro';
-import VariantBRunOfShow from '../components/VariantBRunOfShow.astro';
-import VariantCArgument from '../components/VariantCArgument.astro';
-import VariantSwitcher from '../components/VariantSwitcher.astro';
-import { TALK } from '../talk';
-
-const VARIANTS = [
-  { key: 'A', name: 'Script', purpose: 'Read the talk top to bottom' },
-  { key: 'B', name: 'Run of show', purpose: 'Drive it on the day — and know what to cut' },
-  { key: 'C', name: 'Argument', purpose: 'Trace every claim to its source' },
-];
+import Hub from '../components/Hub.astro';
 ---
 
 <StarlightPage
   frontmatter={{
-    title: TALK.title,
-    description: TALK.description,
+    title: 'Coaching hub',
+    description: 'Publicly available coaching content — talks and workshops on working with AI.',
     template: 'splash',
     tableOfContents: false,
-    // Three variants on one route would be indexed three times over.
-    pagefind: false,
   }}
   hasSidebar={false}
 >
   <div class="pfull">
-    <PrototypeBanner />
-
-    <div data-variant-panel="A">
-      <VariantAScript />
-    </div>
-    <div data-variant-panel="B" hidden>
-      <VariantBRunOfShow />
-    </div>
-    <div data-variant-panel="C" hidden>
-      <VariantCArgument />
-    </div>
-
-    <VariantSwitcher variants={VARIANTS} />
+    <Hub stack="starlight" />
   </div>
 </StarlightPage>

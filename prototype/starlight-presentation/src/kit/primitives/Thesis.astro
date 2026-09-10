@@ -1,0 +1,45 @@
+---
+// Four independent accent-left-border implementations in prototype 1:
+//   VariantAScript.astro:258 (.va__thesis, 3px, base)
+//   VariantBRunOfShow.astro:357 (.vb__dthesis, 3px, no label)
+//   VariantCArgument.astro:295 (.vc__claim, 4px, xl)
+//   VariantCArgument.astro:368 (.vc__so, 3px, base)
+// They differed only in border width and font size, so those become props.
+interface Props {
+  label?: string;
+  size?: 'base' | 'lg' | 'xl';
+}
+const { label, size = 'base' } = Astro.props;
+---
+
+<p class="k-thesis" data-size={size}>
+  {label && <span class="k-thesis__tag">{label}</span>}
+  <slot />
+</p>
+
+<style>
+  .k-thesis {
+    border-inline-start: 3px solid var(--k-accent);
+    padding: 0.5rem 0 0.5rem 1rem;
+    font-size: var(--k-text-base);
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .k-thesis[data-size='lg'] {
+    font-size: var(--k-text-lg);
+  }
+  .k-thesis[data-size='xl'] {
+    font-size: var(--k-text-xl);
+    line-height: 1.45;
+    border-inline-start-width: 4px;
+  }
+  .k-thesis__tag {
+    display: block;
+    font-size: var(--k-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--k-accent-high);
+    margin-block-end: 0.2rem;
+  }
+</style>

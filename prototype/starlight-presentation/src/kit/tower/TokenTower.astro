@@ -1,0 +1,45 @@
+---
+// Module 2's content, assembled ONCE and imported by both stack shells. This is
+// what makes 18 beats × 2 stacks tractable: only the six page shells differ.
+//
+// Beats are listed explicitly rather than glob-imported so the order is
+// readable and reviewable — it is the argument's running order.
+import { BEAT_SECTIONS, BEATS } from './beats';
+import Beat from './Beat.astro';
+import Sources from './Sources.astro';
+import Tower from './Tower.astro';
+import S1_1 from '../beats/S1_1.astro';
+import S2_1 from '../beats/S2_1.astro';
+import S2_2 from '../beats/S2_2.astro';
+import S2_3 from '../beats/S2_3.astro';
+import S2_4 from '../beats/S2_4.astro';
+import S2_5 from '../beats/S2_5.astro';
+import S3_1 from '../beats/S3_1.astro';
+import S3_2 from '../beats/S3_2.astro';
+import S3_3 from '../beats/S3_3.astro';
+
+interface Props {
+  snap?: boolean;
+}
+const { snap = true } = Astro.props;
+
+const CONTENT = { s1_1: S1_1, s2_1: S2_1, s2_2: S2_2, s2_3: S2_3, s2_4: S2_4, s2_5: S2_5, s3_1: S3_1, s3_2: S3_2, s3_3: S3_3 };
+const titleOf = (section: string) =>
+  BEAT_SECTIONS.find((s) => s.num === section)?.title ?? `Section ${section}`;
+const key = (id: string) => id.replace('-', '_') as keyof typeof CONTENT;
+const RENDERABLE = BEATS.filter((b) => CONTENT[key(b.id)]);
+---
+
+<Tower snap={snap}>
+  {
+    RENDERABLE.map((b) => {
+      const Content = CONTENT[key(b.id)];
+      return (
+        <Beat beat={b} sectionTitle={titleOf(b.section)}>
+          <Content />
+        </Beat>
+      );
+    })
+  }
+  <Sources />
+</Tower>

@@ -1,0 +1,24 @@
+---
+// One `Evidence {claim, source}` shape replacing 3–4 hand-rolled row markups.
+import Chip from './Chip.astro';
+interface Props {
+  claim: string;
+  source?: string;
+}
+const { claim, source } = Astro.props;
+---
+
+<li class="k-claim">
+  <span class="k-claim__text">{claim}</span>
+  {source && <Chip>{source}</Chip>}
+</li>
+
+<style>
+  .k-claim {
+    margin-block: 0.4rem;
+    line-height: 1.55;
+  }
+  .k-claim__text {
+    margin-inline-end: 0.35rem;
+  }
+</style>

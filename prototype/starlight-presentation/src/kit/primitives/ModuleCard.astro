@@ -1,0 +1,94 @@
+---
+// New for prototype 2 — the hub needs it. Follows coaching-content/index.html's
+// two-tier pattern: one featured live row, then disabled "coming soon"
+// placeholders that are deliberately not links.
+import type { LearningModule } from '../module';
+import Button from './Button.astro';
+import Chip from './Chip.astro';
+interface Props {
+  module: LearningModule;
+  href?: string;
+  featured?: boolean;
+}
+const { module, href, featured = false } = Astro.props;
+const isLive = module.status === 'live' && Boolean(href);
+---
+
+<article class="k-card" data-featured={featured ? '' : undefined} aria-disabled={!isLive}>
+  <div class="k-card__body">
+    <p class="k-card__eyebrow">
+      {module.kind === 'tower' ? 'Workshop' : 'Talk'}
+      {module.duration && <> · {module.duration}</>}
+      {!isLive && <> · coming soon</>}
+    </p>
+    <h3 class="k-card__title">
+      {isLive ? <a href={href}>{module.title}</a> : module.title}
+    </h3>
+    <p class="k-card__desc">{module.blurb ?? module.description}</p>
+    {
+      module.sources && module.sources.length > 0 && (
+        <p class="k-card__meta">
+          <Chip>{module.sources.length} sources</Chip>
+        </p>
+      )
+    }
+  </div>
+  {
+    isLive && (
+      <div class="k-card__cta">
+        <Button href={href} variant="outline" size="sm">Open →</Button>
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .k-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: end;
+    justify-content: space-between;
+    border-block-start: 1px solid var(--k-border);
+    padding-block: 1.5rem;
+  }
+  .k-card[aria-disabled='true'] {
+    opacity: 0.45;
+  }
+  .k-card[data-featured] {
+    border-block-start-width: 2px;
+    border-block-start-color: var(--k-accent);
+  }
+  .k-card__body {
+    flex: 1 1 28ch;
+    min-width: 0;
+  }
+  .k-card__eyebrow {
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--k-fg-subtle);
+    margin: 0;
+  }
+  .k-card__title {
+    font-size: var(--k-text-xl);
+    line-height: var(--k-line-tight);
+    margin: 0.35rem 0 0.5rem;
+  }
+  .k-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .k-card__title a:hover {
+    color: var(--k-accent-high);
+  }
+  .k-card__desc {
+    margin: 0;
+    color: var(--k-fg-muted);
+    line-height: 1.6;
+    max-width: 60ch;
+  }
+  .k-card__meta {
+    margin: 0.6rem 0 0;
+  }
+</style>

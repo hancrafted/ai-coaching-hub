@@ -1,0 +1,18 @@
+---
+// Duplicated in variants A and B, and SILENTLY ABSENT in C even though
+// `Subsection.aside` was in scope there. Prototype 2 decides deliberately: the
+// kit always renders it, so an unused field is now visible rather than dropped.
+---
+
+<blockquote class="k-aside"><slot /></blockquote>
+
+<style>
+  .k-aside {
+    border-inline-start: 3px solid var(--k-fg-faint);
+    font-style: italic;
+    color: var(--k-fg-muted);
+    font-size: var(--k-text-sm);
+    padding-inline-start: 1rem;
+    margin-inline-start: 0;
+  }
+</style>

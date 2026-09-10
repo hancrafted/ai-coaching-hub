@@ -1,0 +1,41 @@
+---
+// The verdict→colour map was written 3× over the same tokens in prototype 1:
+// VariantAScript.astro:49, VariantBRunOfShow.astro:265, VariantCArgument.astro:315.
+export type Verdict = 'Solved' | 'Holding' | 'Split' | 'Amplified';
+interface Props {
+  verdict: Verdict;
+  label?: string;
+}
+const { verdict, label } = Astro.props;
+---
+
+<span class="k-verdict" data-verdict={verdict}>{label ?? verdict}</span>
+
+<style>
+  .k-verdict {
+    display: inline-block;
+    border-radius: var(--k-radius-pill);
+    padding: 0.1rem 0.6rem;
+    font-size: var(--k-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid currentcolor;
+  }
+  .k-verdict[data-verdict='Solved'] {
+    color: var(--k-solved);
+    background: color-mix(in oklab, var(--k-solved) 14%, transparent);
+  }
+  .k-verdict[data-verdict='Holding'] {
+    color: var(--k-holding);
+    background: color-mix(in oklab, var(--k-holding) 14%, transparent);
+  }
+  .k-verdict[data-verdict='Split'] {
+    color: var(--k-split);
+    background: color-mix(in oklab, var(--k-split) 14%, transparent);
+  }
+  .k-verdict[data-verdict='Amplified'] {
+    color: var(--k-amplified);
+    background: color-mix(in oklab, var(--k-amplified) 14%, transparent);
+  }
+</style>

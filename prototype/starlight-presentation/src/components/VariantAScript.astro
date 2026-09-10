@@ -155,9 +155,9 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     top: 1rem;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
-    border-inline-start: 2px solid var(--sl-color-gray-5);
+    border-inline-start: 2px solid var(--k-border);
     padding-inline-start: 1rem;
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
   }
   @media (max-width: 60rem) {
     .va__toc {
@@ -166,10 +166,10 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     }
   }
   .va__toc-title {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--sl-color-gray-3);
+    color: var(--k-fg-subtle);
     margin: 0 0 0.5rem;
   }
   .va__toc-list,
@@ -186,23 +186,23 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
   }
   .va__toc-list a {
     text-decoration: none;
-    color: var(--sl-color-gray-2);
+    color: var(--k-fg-muted);
     display: block;
     line-height: 1.35;
   }
   .va__toc-list a:hover {
-    color: var(--sl-color-white);
+    color: var(--k-fg);
   }
   .va__toc-num {
-    font-family: var(--sl-font-mono);
-    color: var(--sl-color-accent-high);
+    font-family: var(--k-font-mono);
+    color: var(--k-accent-high);
     margin-inline-end: 0.3rem;
   }
   .va__toc-time {
     float: inline-end;
-    font-family: var(--sl-font-mono);
+    font-family: var(--k-font-mono);
     font-size: 0.75rem;
-    color: var(--sl-color-gray-4);
+    color: var(--k-fg-faint);
   }
 
   /* --- the reading column: a real measure, docs-native rhythm --- */
@@ -210,20 +210,20 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     max-width: 72ch;
   }
   .va__head h1 {
-    font-size: var(--sl-text-4xl);
+    font-size: var(--k-text-4xl);
     line-height: 1.15;
     margin: 0;
   }
   .va__occasion {
-    font-family: var(--sl-font-mono);
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
     margin: 0.4rem 0 0;
   }
   .va__lede {
-    font-size: var(--sl-text-lg);
+    font-size: var(--k-text-lg);
     line-height: 1.6;
-    color: var(--sl-color-gray-2);
+    color: var(--k-fg-muted);
   }
   .va__meta {
     display: flex;
@@ -231,44 +231,44 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     gap: 0.5rem;
     align-items: center;
     padding-block-end: 1rem;
-    border-block-end: 1px solid var(--sl-color-gray-5);
+    border-block-end: 1px solid var(--k-border);
   }
   .va__section {
     margin-block-start: 3rem;
   }
   .va__section h2 {
-    font-size: var(--sl-text-2xl);
-    border-block-end: 1px solid var(--sl-color-gray-5);
+    font-size: var(--k-text-2xl);
+    border-block-end: 1px solid var(--k-border);
     padding-block-end: 0.4rem;
   }
   .va__section h3 {
-    font-size: var(--sl-text-lg);
+    font-size: var(--k-text-lg);
     margin-block-start: 2rem;
   }
   .va__section-time {
     float: inline-end;
-    font-family: var(--sl-font-mono);
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-4);
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-faint);
     font-weight: 400;
   }
   .va__sub {
     scroll-margin-top: 1rem;
   }
   .va__thesis {
-    border-inline-start: 3px solid var(--sl-color-accent);
+    border-inline-start: 3px solid var(--k-accent);
     padding: 0.5rem 0 0.5rem 1rem;
-    font-size: var(--sl-text-base);
+    font-size: var(--k-text-base);
     line-height: 1.6;
     font-weight: 600;
   }
   .va__thesis-tag {
     display: block;
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--sl-color-accent-high);
+    color: var(--k-accent-high);
     margin-block-end: 0.2rem;
   }
   .va__beats {
@@ -278,21 +278,21 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     margin-block: 0.45rem;
   }
   .va__visual {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+    font-size: var(--k-text-sm);
+    color: var(--k-fg-subtle);
   }
   .va__evidence {
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1px solid var(--k-border);
     border-radius: 0.5rem;
     padding: 0.75rem 1rem;
-    background: var(--sl-color-gray-7, var(--sl-color-black));
-    font-size: var(--sl-text-sm);
+    background: var(--k-surface-raised);
+    font-size: var(--k-text-sm);
   }
   .va__evidence-title {
-    font-size: var(--sl-text-xs);
+    font-size: var(--k-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--sl-color-gray-3);
+    color: var(--k-fg-subtle);
     margin: 0 0 0.4rem;
   }
   .va__evidence ul {
@@ -300,13 +300,13 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
     line-height: 1.55;
   }
   .va__aside {
-    border-inline-start: 3px solid var(--sl-color-gray-4);
+    border-inline-start: 3px solid var(--k-fg-faint);
     font-style: italic;
-    color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-sm);
+    color: var(--k-fg-muted);
+    font-size: var(--k-text-sm);
   }
   .va__sources {
-    font-size: var(--sl-text-sm);
+    font-size: var(--k-text-sm);
     line-height: 1.6;
   }
   .va__sources li {

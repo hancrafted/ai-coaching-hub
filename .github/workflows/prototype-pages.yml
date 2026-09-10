@@ -2,11 +2,20 @@ name: Prototype Pages
 
 # Publishes the THROWAWAY Starlight prototype to GitHub Pages.
 #
-# Manual trigger only, deliberately. `main` takes no direct commits in this repo
-# and the prototype is not `main`-bound work, so there is no push path that
-# should auto-deploy it. Run it from the Actions tab against the prototype
-# branch when you want the variants on a URL to review.
+# Triggered by pushes to `prototype/**`, never by `main`. A manual trigger alone
+# was unusable: GitHub only registers `workflow_dispatch` for workflows that
+# already exist on the default branch, and `main` takes no direct commits here,
+# so there was no way to dispatch this at all (`gh workflow run` returned
+# "workflow not found on the default branch"). A push trigger runs the
+# definition from the pushed branch and leaves `main` untouched, so the original
+# intent holds: no push path can auto-deploy `main`.
+#
+# Deploying also needs `prototype/**` in the `github-pages` environment's
+# allowed deployment branches, or `deploy` stops at the environment gate while
+# `build` reports success.
 on:
+  push:
+    branches: ['prototype/**']
   workflow_dispatch:
 
 # The deploy needs to publish Pages and mint an OIDC token; nothing else.

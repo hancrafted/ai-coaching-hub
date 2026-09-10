@@ -1,0 +1,106 @@
+---
+// THROWAWAY PROTOTYPE. Client-side mermaid so the built `/dist` is pure static
+// files — no headless browser at build time, nothing for GitHub Pages to run.
+// Diagrams render on demand when their variant becomes visible, so the two
+// hidden variants cost nothing until you switch to them.
+interface Props {
+  code: string;
+  caption?: string;
+  /** Text alternative — diagrams carry argument here, so this is not optional in practice. */
+  alt: string;
+}
+const { code, caption, alt } = Astro.props;
+---
+
+<figure class="pmmd" data-mermaid>
+  <pre class="pmmd__src" hidden set:text={code} />
+  <div class="pmmd__out" role="img" aria-label={alt}>
+    <p class="pmmd__pending">Rendering diagram…</p>
+  </div>
+  {caption && <figcaption class="pmmd__caption" set:html={caption} />}
+</figure>
+
+<script>
+  import mermaid from 'mermaid';
+
+  const isDark = () => document.documentElement.dataset.theme !== 'light';
+
+  function token(name: string, fallback: string) {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
+  function configure() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: isDark() ? 'dark' : 'default',
+      fontFamily: token('--sl-font', 'system-ui, sans-serif'),
+      themeVariables: {
+        primaryColor: token('--sl-color-gray-6', '#e5e7eb'),
+        primaryTextColor: token('--sl-color-white', '#111'),
+        primaryBorderColor: token('--sl-color-gray-4', '#9ca3af'),
+        lineColor: token('--sl-color-gray-3', '#6b7280'),
+        fontSize: '15px',
+        // Mermaid's default cluster fill is a hard yellow that fights every
+        // Starlight palette. Transparent works in both themes.
+        clusterBkg: 'transparent',
+        clusterBorder: token('--sl-color-gray-4', '#9ca3af'),
+      },
+      flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: true },
+      gantt: { useMaxWidth: true, barHeight: 18, fontSize: 12 },
+      pie: { useMaxWidth: true },
+      xyChart: { useMaxWidth: true },
+    });
+  }
+
+  let seq = 0;
+
+  async function renderPending(root: ParentNode) {
+    const figures = root.querySelectorAll<HTMLElement>('[data-mermaid]:not([data-rendered])');
+    for (const figure of figures) {
+      const code = figure.querySelector('.pmmd__src')?.textContent ?? '';
+      const out = figure.querySelector('.pmmd__out');
+      if (!out) continue;
+      try {
+        const { svg } = await mermaid.render(`pmmd-${seq++}`, code);
+        out.innerHTML = svg;
+        figure.dataset.rendered = 'true';
+      } catch (error) {
+        // Surface the failure loudly — a silently missing diagram in a prototype
+        // reads as "this layout has no visual there", which is the wrong lesson.
+        out.innerHTML = '';
+        const pre = document.createElement('pre');
+        pre.className = 'pmmd__error';
+        pre.textContent = `mermaid failed to render:\n${String(error)}\n\n${code}`;
+        out.append(pre);
+        figure.dataset.rendered = 'error';
+      }
+    }
+  }
+
+  function resetAndRerender() {
+    configure();
+    document
+      .querySelectorAll<HTMLElement>('[data-mermaid][data-rendered]')
+      .forEach((figure) => delete figure.dataset.rendered);
+    const active = document.querySelector('[data-variant-panel]:not([hidden])');
+    void renderPending(active ?? document);
+  }
+
+  configure();
+  void renderPending(document.querySelector('[data-variant-panel]:not([hidden])') ?? document);
+
+  // The switcher fires this when a panel becomes visible.
+  document.addEventListener('prototype:variantchange', (event) => {
+    const panel = (event as CustomEvent<{ panel: HTMLElement }>).detail?.panel;
+    void renderPending(panel ?? document);
+  });
+
+  // Starlight flips `data-theme` on <html>; mermaid bakes colours into the SVG,
+  // so the diagrams have to be thrown away and drawn again.
+  new MutationObserver(resetAndRerender).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+</script>

@@ -1,0 +1,375 @@
+---
+// VARIANT B — "Run of show". Time-first.
+// Primary affordance: drive the talk on the day. Know where you should be on
+// the clock, and know what to cut when you are late.
+// Information hierarchy is the clock, not the argument. Prose is collapsed by
+// default; timings and cut ranks are always visible.
+// Table of contents: the timing table itself — every row a jump link.
+import { DIAGRAMS } from '../diagrams';
+import { SECTIONS } from '../sections';
+import { NEVER_CUT, NEVER_CUT_SECTIONS, TALK, TRIM_ORDER } from '../talk';
+import Mermaid from './Mermaid.astro';
+
+const clock = (total: number) =>
+  `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+
+// Flatten to a run order and stamp each row with its start-on-the-clock.
+let elapsed = 0;
+const rows = SECTIONS.flatMap((section) =>
+  section.subsections.map((sub) => {
+    const start = elapsed;
+    elapsed += sub.seconds;
+    // 2.3 carries two separate cut points (ranks 1 and 3), so this is a list.
+    const trims = TRIM_ORDER.filter((t) => t.section === sub.number);
+    const neverCut = NEVER_CUT_SECTIONS.includes(sub.number);
+    return { section, sub, start, end: elapsed, trims, neverCut };
+  }),
+);
+const total = elapsed;
+---
+
+<div class="vb">
+  <header class="vb__head">
+    <div>
+      <p class="vb__kicker">Run of show</p>
+      <h1>{TALK.title}</h1>
+      <p class="vb__occasion">{TALK.occasion}</p>
+    </div>
+    <div class="vb__clock">
+      <span class="vb__clock-big">{clock(total)}</span>
+      <span class="vb__clock-note">{TALK.envelope}</span>
+    </div>
+  </header>
+
+  <div class="vb__charts">
+    <Mermaid
+      code={DIAGRAMS.runOfShow}
+      alt="Gantt chart of the eleven segments across 26 minutes, with 2.1, 2.2 and 3.4 marked never-cut"
+      caption="Red bars are the segments the script marks <strong>never cut</strong>: 2.1, 2.2 and 3.4's hook."
+    />
+    <Mermaid
+      code={DIAGRAMS.timeBudget}
+      alt="Pie chart of the time budget: 4, 11, 7 and 4 minutes across the four sections"
+      caption="Section 2 carries the argument and 42% of the clock."
+    />
+  </div>
+
+  <h2 id="b-table">The running order</h2>
+  <p class="vb__hint">
+    Every row jumps to its beats. <strong>Cut</strong> shows the script's trim rank — lower goes
+    first.
+  </p>
+
+  <table class="vb__table">
+    <thead>
+      <tr>
+        <th scope="col">At</th>
+        <th scope="col">#</th>
+        <th scope="col">Segment</th>
+        <th scope="col">Thesis</th>
+        <th scope="col">Len</th>
+        <th scope="col">Cut</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(({ section, sub, start, trims, neverCut }) => (
+          <tr class:list={[{ 'vb__row--sectionstart': sub === section.subsections[0] }]}>
+            <td class="vb__at">{clock(start)}</td>
+            <td class="vb__num">{sub.number}</td>
+            <td>
+              <a href={`#b-${sub.id}`}>{sub.title}</a>
+            </td>
+            <td class="vb__thesis">{sub.thesis}</td>
+            <td class="vb__len">{clock(sub.seconds)}</td>
+            <td class="vb__cut">
+              {trims.map((trim) => (
+                <span class="vb__cutrank" title={trim.how}>
+                  {trim.rank}
+                </span>
+              ))}
+              {neverCut && <span class="vb__never" title={NEVER_CUT}>never</span>}
+              {trims.length === 0 && !neverCut && <span class="vb__nocut">&#8212;</span>}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+    <tfoot>
+      <tr>
+        <td class="vb__at">{clock(total)}</td>
+        <td colspan="3">Total</td>
+        <td class="vb__len">{clock(total)}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="vb__panels">
+    <section class="vb__panel">
+      <h2>Trim order, if long</h2>
+      <ol class="vb__trim">
+        {
+          TRIM_ORDER.map((trim) => (
+            <li>
+              <strong>{trim.target}</strong> — {trim.how}
+              {trim.lastResort && <strong class="vb__lastresort"> Last resort.</strong>}
+              <span class="pchip">saves ~{trim.saves}s</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+    <section class="vb__panel vb__panel--warn">
+      <h2>Never cut</h2>
+      <p>{NEVER_CUT}</p>
+    </section>
+  </div>
+
+  <h2 id="b-beats">Beats, collapsed</h2>
+  {
+    rows.map(({ sub, start }) => (
+      <details class="vb__details" id={`b-${sub.id}`}>
+        <summary>
+          <span class="vb__at">{clock(start)}</span>
+          <span class="vb__num">{sub.number}</span>
+          {sub.title}
+          <span class="vb__len">{clock(sub.seconds)}</span>
+        </summary>
+        <p class="vb__dthesis">{sub.thesis}</p>
+        <ul>
+          {sub.beats.map((beat) => (
+            <li>{beat}</li>
+          ))}
+        </ul>
+        {sub.visual && (
+          <p class="vb__visual">
+            <strong>Visual.</strong> {sub.visual}
+          </p>
+        )}
+        {sub.aside && <blockquote>{sub.aside}</blockquote>}
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .vb {
+    max-width: 100%;
+  }
+  .vb__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-block-end: 2px solid var(--sl-color-gray-5);
+    padding-block-end: 0.75rem;
+  }
+  .vb__kicker {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sl-color-accent-high);
+    margin: 0;
+  }
+  .vb__head h1 {
+    font-size: var(--sl-text-3xl);
+    margin: 0.2rem 0 0;
+  }
+  .vb__occasion {
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+    margin: 0.3rem 0 0;
+  }
+  .vb__clock {
+    text-align: end;
+    display: flex;
+    flex-direction: column;
+  }
+  .vb__clock-big {
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-4xl);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .vb__clock-note {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+
+  .vb__charts {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (max-width: 60rem) {
+    .vb__charts {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .vb__hint {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+
+  /* --- the timing table IS this variant's table of contents --- */
+  .vb__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--sl-text-sm);
+    display: table;
+  }
+  .vb__table th {
+    text-align: start;
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sl-color-gray-3);
+    border-block-end: 1px solid var(--sl-color-gray-5);
+    padding: 0.4rem 0.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--sl-color-bg);
+    z-index: 1;
+  }
+  .vb__table td {
+    padding: 0.45rem 0.5rem;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: top;
+  }
+  .vb__row--sectionstart td {
+    border-block-start: 2px solid var(--sl-color-gray-5);
+  }
+  .vb__at,
+  .vb__len,
+  .vb__num {
+    font-family: var(--sl-font-mono);
+    white-space: nowrap;
+  }
+  .vb__at {
+    color: var(--sl-color-accent-high);
+    font-weight: 700;
+  }
+  .vb__len,
+  .vb__num {
+    color: var(--sl-color-gray-3);
+  }
+  .vb__thesis {
+    color: var(--sl-color-gray-2);
+    line-height: 1.45;
+  }
+  .vb__cutrank {
+    display: inline-block;
+    min-width: 1.6rem;
+    text-align: center;
+    border-radius: 0.25rem;
+    background: color-mix(in oklab, var(--p-holding) 22%, transparent);
+    color: var(--p-holding);
+    border: 1px solid var(--p-holding);
+    font-weight: 700;
+    cursor: help;
+  }
+  /* A segment can carry two cut ranks (2.3 does) plus a never-cut flag, so lay
+     the cell out rather than relying on inline spacing. */
+  .vb__cut {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  .vb__never {
+    display: inline-block;
+    border-radius: 0.25rem;
+    padding-inline: 0.35rem;
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--p-amplified);
+    border: 1px solid var(--p-amplified);
+    background: color-mix(in oklab, var(--p-amplified) 12%, transparent);
+    cursor: help;
+  }
+  .vb__nocut {
+    color: var(--sl-color-gray-4);
+  }
+  .vb__lastresort {
+    color: var(--p-amplified);
+  }
+  .vb__table tfoot td {
+    font-weight: 700;
+    border-block-start: 2px solid var(--sl-color-gray-5);
+    border-block-end: 0;
+  }
+
+  .vb__panels {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 1rem;
+    margin-block-start: 2rem;
+  }
+  @media (max-width: 60rem) {
+    .vb__panels {
+      grid-template-columns: 1fr;
+    }
+  }
+  .vb__panel {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem 1rem;
+  }
+  .vb__panel h2 {
+    font-size: var(--sl-text-base);
+    margin-block-start: 0.75rem;
+  }
+  .vb__panel--warn {
+    border-color: var(--p-amplified);
+    background: color-mix(in oklab, var(--p-amplified) 8%, transparent);
+  }
+  .vb__trim {
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+    padding-inline-start: 1.2rem;
+  }
+  .vb__trim li {
+    margin-block: 0.5rem;
+  }
+
+  .vb__details {
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    padding-block: 0.35rem;
+    scroll-margin-top: 1rem;
+  }
+  .vb__details summary {
+    cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-weight: 600;
+  }
+  .vb__details summary .vb__len {
+    margin-inline-start: auto;
+  }
+  .vb__dthesis {
+    font-weight: 600;
+    border-inline-start: 3px solid var(--sl-color-accent);
+    padding-inline-start: 0.75rem;
+  }
+  .vb__details ul {
+    font-size: var(--sl-text-sm);
+    line-height: 1.55;
+  }
+  .vb__visual {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .vb__details blockquote {
+    font-style: italic;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+</style>

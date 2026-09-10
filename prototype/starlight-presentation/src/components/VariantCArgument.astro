@@ -1,0 +1,406 @@
+---
+// VARIANT C — "Argument". Claim-first.
+// Primary affordance: interrogate whether the talk holds up. Every claim is
+// shown next to the corpus document it rests on, and refuted claims are shown
+// struck through rather than quietly deleted.
+// Information hierarchy is verdict → claim → evidence → source. Timing is
+// absent entirely; that is variant B's job.
+// Table of contents: a claim ledger — one line per claim, grouped by source.
+import { DIAGRAMS } from '../diagrams';
+import { SECTIONS } from '../sections';
+import { CORRECTIONS, FAILURE_MODES, OPEN_GAPS, SOURCES, TALK } from '../talk';
+import Mermaid from './Mermaid.astro';
+
+// Invert the section data: claims grouped by the source they lean on.
+const bySource = Object.keys(SOURCES).map((id) => ({
+  id,
+  ...SOURCES[id],
+  claims: SECTIONS.flatMap((section) =>
+    section.subsections.flatMap((sub) =>
+      (sub.evidence ?? [])
+        .filter((item) => item.source === id)
+        .map((item) => ({ number: sub.number, claim: item.claim, anchor: `c-${sub.id}` })),
+    ),
+  ),
+}));
+---
+
+<div class="vc">
+  <nav class="vc__ledger" aria-label="Claim ledger">
+    <p class="vc__ledger-title">Claim ledger</p>
+    <p class="vc__ledger-note">
+      {bySource.reduce((n, s) => n + s.claims.length, 0)} claims ·
+      {bySource.filter((s) => s.claims.length > 0).length} of {bySource.length} documents cited
+    </p>
+    {
+      bySource.map((source) => (
+        <div class="vc__ledger-group">
+          <p class="vc__ledger-src">
+            <span class="pchip">{source.id}</span>
+          </p>
+          <ul>
+            {source.claims.map((claim) => (
+              <li>
+                <a href={`#${claim.anchor}`}>
+                  <span class="vc__num">§{claim.number}</span>
+                  {claim.claim.length > 88 ? `${claim.claim.slice(0, 88)}…` : claim.claim}
+                </a>
+              </li>
+            ))}
+            {source.claims.length === 0 && <li class="vc__uncited">not cited in this build</li>}
+          </ul>
+        </div>
+      ))
+    }
+  </nav>
+
+  <article class="vc__main">
+    <header class="vc__head">
+      <p class="vc__kicker">The argument</p>
+      <h1>{TALK.title}</h1>
+      <p class="vc__claim">
+        {SECTIONS[3].subsections[0].thesis}
+      </p>
+    </header>
+
+    <h2 id="c-verdicts">Four failure modes, re-scored</h2>
+    <div class="vc__cards">
+      {
+        FAILURE_MODES.map((mode) => (
+          <section class="vc__card" data-verdict={mode.verdict}>
+            <p class="vc__card-top">
+              <span class="vc__num">{mode.n}</span>
+              <span class="pverdict" data-verdict={mode.verdict}>
+                {mode.verdict}
+              </span>
+            </p>
+            <h3>{mode.name}</h3>
+            <p class="vc__gloss">{mode.gloss}</p>
+            <dl class="vc__ba">
+              <dt>Before</dt>
+              <dd>{mode.before}</dd>
+              <dt>With AI</dt>
+              <dd>{mode.withAi}</dd>
+            </dl>
+          </section>
+        ))
+      }
+    </div>
+
+    <Mermaid
+      code={DIAGRAMS.triage}
+      alt="The four failure modes mapped to their verdicts, with mode 3 splitting into two opposite verdicts"
+      caption="Row 3 is the hinge: <strong>one row, two opposite verdicts</strong>. Discoverability solved, verification of trust amplified."
+    />
+
+    <h2 id="c-evidence">The evidence that does the work</h2>
+
+    <section class="vc__ev" id="c-triage">
+      <h3>The moat story runs backwards</h3>
+      <p>
+        The intuitive claim is that AI dissolves moats wherever it has training data. The data
+        refutes it in both directions — and the researchers attribute the JS/TS result to language
+        and tooling properties, <strong>not</strong> to data scarcity.
+      </p>
+      <Mermaid
+        code={DIAGRAMS.moatInversion}
+        alt="Bar chart: JavaScript at 486 GB resolves 4.78 percent, Python at 191 GB resolves 45.8 percent, TypeScript at 131 GB resolves 11.16 percent"
+        caption="Multi-SWE-bench, 1,632 human-validated issues, Claude-3.7-Sonnet. Ordered by corpus size, descending. <span class='pchip'>knowledge-moats</span>"
+      />
+      <p class="vc__so">
+        <strong>So:</strong> density predicts how well a model writes a snippet. It does not predict
+        whether it can resolve an issue in your repository. Your moat is where the work is
+        repo-shaped.
+      </p>
+    </section>
+
+    <section class="vc__ev" id="c-state-of-art">
+      <h3>Retrieval cannot tell you the index is stale</h3>
+      <p>
+        The scoring step is an inner product between two embeddings. There is no third term for age,
+        origin or verification — so this is mechanism, not an opinion about implementations.
+      </p>
+      <Mermaid
+        code={DIAGRAMS.ragHotSwap}
+        alt="Bar chart: right-era index scores 70 and 68 percent, wrong-era index scores 12 and 4 percent"
+        caption="Lewis et al. 2020 hot-swap, 82 world leaders whose posts changed between 2016 and 2018. <strong>Nothing in the model noticed.</strong> A person had to know, and swap it. <span class='pchip'>rag</span>"
+      />
+      <Mermaid
+        code={DIAGRAMS.standardsTimeline}
+        alt="Timeline contrasting Dublin Core's route to ISO with today's formats, none of which have crossed into standardisation"
+        caption="What crossing the line actually looks like, against what we have. <span class='pchip'>docs-standards</span>"
+      />
+    </section>
+
+    <section class="vc__ev" id="c-harness">
+      <h3>Get the names right</h3>
+      <Mermaid
+        code={DIAGRAMS.driftModes}
+        alt="Taxonomy of drift: reference rot splits into link rot and content drift; structure drift is our coinage; citation drift is not ours"
+        caption="Two borrowed names, one flagged as ours, and one deliberately refused. <span class='pchip'>doc-drift</span>"
+      />
+    </section>
+
+    <section class="vc__ev" id="c-relocated">
+      <h3>The statistic the whole argument rests on</h3>
+      <Mermaid
+        code={DIAGRAMS.staleFate}
+        alt="Pie chart: 47.6 percent of stale references were fixed by code changing again, 39.1 percent by documentation edits, 13.3 percent by deletion"
+        caption="Documentation does not get repaired. It gets <strong>accidentally re-aligned</strong> — and a stale reference stays wrong for 4.7 years on average. <span class='pchip'>doc-cost</span>"
+      />
+    </section>
+
+    <h2 id="c-coverage">Every claim traced to a document</h2>
+    <p>
+      The script's <code>sources</code> block is cited-only: every document listed is cited
+      somewhere, and every claim traces to one.
+    </p>
+    <Mermaid
+      code={DIAGRAMS.argumentSpine}
+      alt="Graph linking each section to the corpus documents it cites"
+      caption="No orphan sources, no unsourced sections."
+    />
+
+    <h2 id="c-corrections">Claims that did not survive</h2>
+    <p class="vc__hint">
+      Shown struck through rather than deleted — each is stamped with the version it was checked
+      against.
+    </p>
+    <ol class="vc__corrections">
+      {
+        CORRECTIONS.map((correction) => (
+          <li>
+            <p class="vc__struck">{correction.claim}</p>
+            <p class="vc__stamp">
+              <span class="pchip">{correction.stamp}</span>
+            </p>
+            <p class="vc__detail">{correction.detail}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <h2 id="c-gaps">Still open</h2>
+    <ul class="vc__gaps">
+      {
+        OPEN_GAPS.map((gap) => (
+          <li>
+            <strong>{gap.title}</strong> — {gap.detail}
+          </li>
+        ))
+      }
+      <li>
+        <strong>Promotion</strong> — the script is <code>status: {TALK.status}</code> and every
+        reference it leans on is still a draft. Promotion is Han's act alone.
+      </li>
+    </ul>
+  </article>
+</div>
+
+<style>
+  .vc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 21rem);
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 68rem) {
+    .vc {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* --- the claim ledger IS this variant's table of contents --- */
+  .vc__ledger {
+    order: 2;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: var(--sl-text-xs);
+  }
+  @media (max-width: 68rem) {
+    .vc__ledger {
+      order: 0;
+      position: static;
+      max-height: none;
+    }
+  }
+  .vc__ledger-title {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sl-color-accent-high);
+    font-weight: 700;
+    margin: 0;
+  }
+  .vc__ledger-note {
+    color: var(--sl-color-gray-3);
+    margin: 0.2rem 0 0.75rem;
+  }
+  .vc__ledger-group {
+    margin-block-end: 0.75rem;
+  }
+  .vc__ledger-src {
+    margin: 0 0 0.25rem;
+  }
+  .vc__ledger ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 0.25rem;
+    border-inline-start: 1px solid var(--sl-color-gray-6);
+  }
+  .vc__ledger li {
+    margin-block: 0.3rem;
+    padding-inline-start: 0.5rem;
+  }
+  .vc__ledger a {
+    text-decoration: none;
+    color: var(--sl-color-gray-2);
+    line-height: 1.4;
+    display: block;
+  }
+  .vc__ledger a:hover {
+    color: var(--sl-color-white);
+  }
+  .vc__uncited {
+    color: var(--p-amplified);
+    font-style: italic;
+    padding-inline-start: 0.5rem;
+  }
+  .vc__num {
+    font-family: var(--sl-font-mono);
+    color: var(--sl-color-accent-high);
+    margin-inline-end: 0.35rem;
+  }
+
+  .vc__main {
+    order: 1;
+    min-width: 0;
+  }
+  .vc__kicker {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sl-color-accent-high);
+    margin: 0;
+  }
+  .vc__head h1 {
+    font-size: var(--sl-text-3xl);
+    margin: 0.2rem 0 0.5rem;
+  }
+  .vc__claim {
+    font-size: var(--sl-text-xl);
+    line-height: 1.45;
+    font-weight: 600;
+    border-inline-start: 4px solid var(--sl-color-accent);
+    padding-inline-start: 1rem;
+  }
+
+  /* --- verdict cards: the spine of this variant --- */
+  .vc__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.75rem;
+  }
+  .vc__card {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem 1rem;
+    border-inline-start-width: 4px;
+  }
+  .vc__card[data-verdict='Solved'] {
+    border-inline-start-color: var(--p-solved);
+  }
+  .vc__card[data-verdict='Holding'] {
+    border-inline-start-color: var(--p-holding);
+  }
+  .vc__card[data-verdict='Split'] {
+    border-inline-start-color: var(--p-split);
+  }
+  .vc__card[data-verdict='Amplified'] {
+    border-inline-start-color: var(--p-amplified);
+  }
+  .vc__card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+  }
+  .vc__card h3 {
+    font-size: var(--sl-text-base);
+    margin: 0.4rem 0 0.1rem;
+  }
+  .vc__gloss {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    margin: 0 0 0.5rem;
+  }
+  .vc__ba {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.6rem;
+  }
+  .vc__ba dt {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--sl-color-gray-4);
+    padding-block-start: 0.15rem;
+  }
+  .vc__ba dd {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .vc__ev {
+    margin-block-start: 2rem;
+    scroll-margin-top: 1rem;
+  }
+  .vc__ev h3 {
+    font-size: var(--sl-text-lg);
+  }
+  .vc__so {
+    border-inline-start: 3px solid var(--sl-color-accent);
+    padding: 0.4rem 0 0.4rem 1rem;
+    font-weight: 600;
+  }
+  .vc__hint {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+
+  .vc__corrections {
+    list-style: none;
+    padding: 0;
+  }
+  .vc__corrections li {
+    border-inline-start: 3px solid var(--p-amplified);
+    padding-inline-start: 1rem;
+    margin-block: 1rem;
+  }
+  .vc__struck {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    color: var(--sl-color-gray-3);
+    font-weight: 600;
+    margin: 0;
+  }
+  .vc__stamp {
+    margin: 0.25rem 0;
+  }
+  .vc__detail {
+    font-size: var(--sl-text-sm);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .vc__gaps {
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+</style>

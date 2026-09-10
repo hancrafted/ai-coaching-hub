@@ -1,0 +1,90 @@
+---
+// THROWAWAY PROTOTYPE. Floating switcher: arrows cycle variants, the URL keeps
+// `?variant=` so a variant is shareable and survives reload, and the arrow keys
+// work unless you are typing.
+//
+// Deliberate deviation from the prototype skill: the skill hides this bar in
+// production builds so a stray merge cannot ship it. Here the built `/dist` IS
+// the review artifact — hiding the bar would make the hosted site useless — so
+// it stays visible and the PROTOTYPE banner above carries the warning instead.
+interface Props {
+  variants: { key: string; name: string; purpose: string }[];
+}
+const { variants } = Astro.props;
+---
+
+<div class="pswitch" data-variant-switcher data-variants={JSON.stringify(variants)}>
+  <button type="button" class="pswitch__arrow" data-step="-1" aria-label="Previous variant">
+    &#8592;
+  </button>
+  <span class="pswitch__body">
+    <span class="pswitch__label" data-variant-label>loading…</span>
+    <span class="pswitch__purpose" data-variant-purpose></span>
+  </span>
+  <button type="button" class="pswitch__arrow" data-step="1" aria-label="Next variant">
+    &#8594;
+  </button>
+</div>
+
+<script>
+  interface Variant {
+    key: string;
+    name: string;
+    purpose: string;
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-variant-switcher]');
+  if (root) {
+    const variants: Variant[] = JSON.parse(root.dataset.variants ?? '[]');
+    const keys = variants.map((v) => v.key);
+    const label = root.querySelector<HTMLElement>('[data-variant-label]');
+    const purpose = root.querySelector<HTMLElement>('[data-variant-purpose]');
+
+    const currentKey = () => {
+      const asked = new URLSearchParams(location.search).get('variant');
+      return asked && keys.includes(asked) ? asked : keys[0];
+    };
+
+    function apply(key: string, writeUrl: boolean) {
+      const variant = variants.find((v) => v.key === key);
+      if (label) label.textContent = `Variant ${key} — ${variant?.name ?? ''}`;
+      if (purpose) purpose.textContent = variant?.purpose ?? '';
+
+      document.querySelectorAll<HTMLElement>('[data-variant-panel]').forEach((panel) => {
+        const active = panel.dataset.variantPanel === key;
+        panel.hidden = !active;
+        if (active) {
+          // Mermaid renders lazily, so tell it a fresh panel just appeared.
+          document.dispatchEvent(
+            new CustomEvent('prototype:variantchange', { detail: { panel, key } }),
+          );
+        }
+      });
+
+      if (writeUrl) {
+        const url = new URL(location.href);
+        url.searchParams.set('variant', key);
+        history.replaceState(null, '', url);
+      }
+    }
+
+    function step(delta: number) {
+      const next = (keys.indexOf(currentKey()) + delta + keys.length) % keys.length;
+      apply(keys[next], true);
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((button) => {
+      button.addEventListener('click', () => step(Number(button.dataset.step)));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.key === 'ArrowLeft') step(-1);
+      if (event.key === 'ArrowRight') step(1);
+    });
+
+    apply(currentKey(), false);
+  }
+</script>

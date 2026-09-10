@@ -1,0 +1,45 @@
+name: Prototype Pages
+
+# Publishes the THROWAWAY Starlight prototype to GitHub Pages.
+#
+# Manual trigger only, deliberately. `main` takes no direct commits in this repo
+# and the prototype is not `main`-bound work, so there is no push path that
+# should auto-deploy it. Run it from the Actions tab against the prototype
+# branch when you want the variants on a URL to review.
+on:
+  workflow_dispatch:
+
+# The deploy needs to publish Pages and mint an OIDC token; nothing else.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel a half-finished one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # `base` must match the repo name for a project page; build:pages sets it.
+      - name: Build prototype
+        uses: withastro/action@v6
+        with:
+          path: ./prototype/starlight-presentation
+          build-cmd: npm run build:pages
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

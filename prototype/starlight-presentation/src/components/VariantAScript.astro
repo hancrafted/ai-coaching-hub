@@ -1,0 +1,315 @@
+---
+// VARIANT A — "Script". Reading-first.
+// Primary affordance: read the talk top to bottom. Information hierarchy is
+// the script's own: section → subsection → thesis → beats → evidence.
+// Table of contents: a sticky nested rail on the left, docs-native.
+import { DIAGRAMS } from '../diagrams';
+import { SECTIONS } from '../sections';
+import { SOURCES, TALK } from '../talk';
+import Mermaid from './Mermaid.astro';
+
+const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+---
+
+<div class="va">
+  <nav class="va__toc" aria-label="Table of contents">
+    <p class="va__toc-title">On this page</p>
+    <ol class="va__toc-list">
+      {
+        SECTIONS.map((section) => (
+          <li>
+            <a href={`#a-${section.id}`}>
+              <span class="va__toc-num">{section.number}</span> {section.title}
+              <span class="va__toc-time">{section.minutes}m</span>
+            </a>
+            <ol>
+              {section.subsections
+                .filter((sub) => sub.number !== section.number)
+                .map((sub) => (
+                  <li>
+                    <a href={`#a-${sub.id}`}>
+                      <span class="va__toc-num">{sub.number}</span> {sub.title}
+                    </a>
+                  </li>
+                ))}
+            </ol>
+          </li>
+        ))
+      }
+      <li><a href="#a-sources">Sources</a></li>
+    </ol>
+  </nav>
+
+  <article class="va__doc">
+    <header class="va__head">
+      <h1>{TALK.title}</h1>
+      <p class="va__occasion">{TALK.occasion}</p>
+      <p class="va__lede">{TALK.description}</p>
+      <p class="va__meta">
+        <span class="pverdict" data-verdict="Amplified">status: {TALK.status}</span>
+        <span class="pchip">stale_after {TALK.staleAfter}</span>
+        <span class="pchip">{TALK.totalMinutes} min · {TALK.envelope}</span>
+      </p>
+    </header>
+
+    {
+      SECTIONS.map((section) => (
+        <section class="va__section" id={`a-${section.id}`}>
+          <h2>
+            <span class="va__toc-num">{section.number}</span> {section.title}
+            <span class="va__section-time">~{section.minutes} min</span>
+          </h2>
+
+          {section.subsections.map((sub) => (
+            <div class="va__sub" id={`a-${sub.id}`}>
+              {sub.number !== section.number && (
+                <h3>
+                  <span class="va__toc-num">{sub.number}</span> {sub.title}
+                  <span class="va__section-time">{mmss(sub.seconds)}</span>
+                </h3>
+              )}
+
+              <p class="va__thesis">
+                <span class="va__thesis-tag">Thesis</span>
+                {sub.thesis}
+              </p>
+
+              <ul class="va__beats">
+                {sub.beats.map((beat) => (
+                  <li>{beat}</li>
+                ))}
+              </ul>
+
+              {sub.diagram && (
+                <Mermaid
+                  code={DIAGRAMS[sub.diagram]}
+                  alt={`Diagram for section ${sub.number}: ${sub.title}`}
+                  caption={sub.visual ? `<strong>Visual note from the script.</strong> ${sub.visual}` : undefined}
+                />
+              )}
+
+              {!sub.diagram && sub.visual && (
+                <p class="va__visual">
+                  <strong>Visual.</strong> {sub.visual}
+                </p>
+              )}
+
+              {sub.evidence && (
+                <div class="va__evidence">
+                  <p class="va__evidence-title">Evidence</p>
+                  <ul>
+                    {sub.evidence.map((item) => (
+                      <li>
+                        {item.claim} <span class="pchip">{item.source}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {sub.aside && <blockquote class="va__aside">{sub.aside}</blockquote>}
+            </div>
+          ))}
+        </section>
+      ))
+    }
+
+    <section class="va__section" id="a-sources">
+      <h2>Sources</h2>
+      <p class="va__thesis">
+        <span class="va__thesis-tag">Cited-only</span>
+        Every document listed is cited somewhere above, and every claim above traces to one.
+      </p>
+      <ol class="va__sources">
+        {
+          Object.entries(SOURCES).map(([id, source]) => (
+            <li>
+              <span class="pchip">{id}</span> {source.title}
+              <br />
+              <code>{source.resource}</code>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </article>
+</div>
+
+<style>
+  .va {
+    display: grid;
+    grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: start;
+  }
+  @media (max-width: 60rem) {
+    .va {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  /* --- the table of contents is this variant's navigation --- */
+  .va__toc {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    border-inline-start: 2px solid var(--sl-color-gray-5);
+    padding-inline-start: 1rem;
+    font-size: var(--sl-text-sm);
+  }
+  @media (max-width: 60rem) {
+    .va__toc {
+      position: static;
+      max-height: none;
+    }
+  }
+  .va__toc-title {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sl-color-gray-3);
+    margin: 0 0 0.5rem;
+  }
+  .va__toc-list,
+  .va__toc-list ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .va__toc-list ol {
+    margin-inline-start: 0.75rem;
+  }
+  .va__toc-list li {
+    margin-block: 0.3rem;
+  }
+  .va__toc-list a {
+    text-decoration: none;
+    color: var(--sl-color-gray-2);
+    display: block;
+    line-height: 1.35;
+  }
+  .va__toc-list a:hover {
+    color: var(--sl-color-white);
+  }
+  .va__toc-num {
+    font-family: var(--sl-font-mono);
+    color: var(--sl-color-accent-high);
+    margin-inline-end: 0.3rem;
+  }
+  .va__toc-time {
+    float: inline-end;
+    font-family: var(--sl-font-mono);
+    font-size: 0.75rem;
+    color: var(--sl-color-gray-4);
+  }
+
+  /* --- the reading column: a real measure, docs-native rhythm --- */
+  .va__doc {
+    max-width: 72ch;
+  }
+  .va__head h1 {
+    font-size: var(--sl-text-4xl);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .va__occasion {
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+    margin: 0.4rem 0 0;
+  }
+  .va__lede {
+    font-size: var(--sl-text-lg);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+  .va__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding-block-end: 1rem;
+    border-block-end: 1px solid var(--sl-color-gray-5);
+  }
+  .va__section {
+    margin-block-start: 3rem;
+  }
+  .va__section h2 {
+    font-size: var(--sl-text-2xl);
+    border-block-end: 1px solid var(--sl-color-gray-5);
+    padding-block-end: 0.4rem;
+  }
+  .va__section h3 {
+    font-size: var(--sl-text-lg);
+    margin-block-start: 2rem;
+  }
+  .va__section-time {
+    float: inline-end;
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-4);
+    font-weight: 400;
+  }
+  .va__sub {
+    scroll-margin-top: 1rem;
+  }
+  .va__thesis {
+    border-inline-start: 3px solid var(--sl-color-accent);
+    padding: 0.5rem 0 0.5rem 1rem;
+    font-size: var(--sl-text-base);
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .va__thesis-tag {
+    display: block;
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sl-color-accent-high);
+    margin-block-end: 0.2rem;
+  }
+  .va__beats {
+    line-height: 1.65;
+  }
+  .va__beats li {
+    margin-block: 0.45rem;
+  }
+  .va__visual {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .va__evidence {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--sl-color-gray-7, var(--sl-color-black));
+    font-size: var(--sl-text-sm);
+  }
+  .va__evidence-title {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sl-color-gray-3);
+    margin: 0 0 0.4rem;
+  }
+  .va__evidence ul {
+    margin: 0;
+    line-height: 1.55;
+  }
+  .va__aside {
+    border-inline-start: 3px solid var(--sl-color-gray-4);
+    font-style: italic;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+  }
+  .va__sources {
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+  .va__sources li {
+    margin-block: 0.6rem;
+  }
+</style>

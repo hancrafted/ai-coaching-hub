@@ -5,6 +5,8 @@
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "prototype": "npm --prefix prototype/starlight-presentation install && npm --prefix prototype/starlight-presentation run dev",
+    "prototype:build": "npm --prefix prototype/starlight-presentation install && npm --prefix prototype/starlight-presentation run build:pages",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "knip": "knip",

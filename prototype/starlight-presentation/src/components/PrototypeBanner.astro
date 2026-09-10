@@ -1,0 +1,24 @@
+---
+import { TALK } from '../talk';
+
+const repoFile = `https://github.com/hancrafted/ai-coaching-hub/blob/map/10-llm-wiki/${TALK.sourcePath}`;
+// Must go through BASE_URL: under GitHub Pages this site lives at /ai-coaching-hub/.
+// `new URL()` is no help here — BASE_URL is a path, not an absolute URL.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const controlPage = `${base}/2026-09-15-maintaining-high-value-knowledge-bases/`;
+---
+
+<aside class="pbanner">
+  <p class="pbanner__tag">Prototype — throwaway</p>
+  <p class="pbanner__text">
+    Three structurally different ways to render one talk. Cycle them with the bar at the bottom, the
+    <kbd>&#8592;</kbd> / <kbd>&#8594;</kbd> keys, or <code>?variant=A|B|C</code>. The content is
+    identical in all three — only the layout, the information hierarchy and the table of contents
+    change.
+  </p>
+  <p class="pbanner__links">
+    <a href={repoFile}>Source script: <code>{TALK.sourcePath}</code></a>
+    <span aria-hidden="true">·</span>
+    <a href={controlPage}>Control: the governed file rendered as-is, no design work</a>
+  </p>
+</aside>

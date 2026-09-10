@@ -2,3 +2,7 @@ node_modules
 coverage
 dist
 .archgate/rules.d.ts
+
+# Throwaway prototype: .astro needs prettier-plugin-astro, which the root
+# toolchain deliberately does not carry.
+prototype

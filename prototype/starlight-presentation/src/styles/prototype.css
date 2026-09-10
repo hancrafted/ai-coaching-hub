@@ -1,0 +1,191 @@
+/* THROWAWAY PROTOTYPE — global shell only.
+   Each variant carries its own layout in a scoped <style> block, so no variant
+   can quietly inherit another's structure. Everything here is chrome: banner,
+   switcher, diagram frame, verdict colours. */
+
+:root {
+  --p-solved: #16a34a;
+  --p-holding: #d97706;
+  --p-split: #2563eb;
+  --p-amplified: #dc2626;
+  --p-rail: color-mix(in oklab, var(--sl-color-gray-6) 60%, transparent);
+}
+
+/* The prototype route owns the full viewport width; the control page keeps
+   Starlight's normal measure. */
+.pfull .sl-container,
+.pfull {
+  max-width: none;
+}
+
+/* ---------- banner ---------- */
+.pbanner {
+  border: 1px dashed var(--sl-color-orange);
+  border-radius: 0.5rem;
+  background: var(--sl-color-orange-low);
+  padding: 0.75rem 1rem;
+  margin-block-end: 1.5rem;
+}
+.pbanner__tag {
+  font-size: var(--sl-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sl-color-orange-high);
+  margin: 0 0 0.25rem;
+}
+.pbanner__text,
+.pbanner__links {
+  margin: 0;
+  font-size: var(--sl-text-sm);
+  line-height: 1.5;
+}
+.pbanner__links {
+  margin-block-start: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.pbanner kbd {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.25rem;
+  padding: 0 0.3rem;
+  font-size: 0.85em;
+}
+
+/* ---------- floating switcher ---------- */
+.pswitch {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 1rem;
+  z-index: 100;
+  margin-inline: auto;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  display: flex;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: var(--sl-color-black);
+  border: 2px solid var(--sl-color-white);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 45%);
+}
+.pswitch__arrow {
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.5rem 0.85rem;
+}
+.pswitch__arrow:hover {
+  background: var(--sl-color-accent);
+}
+.pswitch__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-inline: 0.6rem;
+  min-width: 20ch;
+}
+.pswitch__label {
+  color: var(--sl-color-white);
+  font-size: var(--sl-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pswitch__purpose {
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- diagram frame ---------- */
+.pmmd {
+  margin: 1.5rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-black);
+  overflow-x: auto;
+}
+.pmmd__out svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-inline: auto;
+}
+.pmmd__pending {
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+}
+.pmmd__caption {
+  margin-block-start: 0.6rem;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-2);
+  line-height: 1.5;
+  text-align: center;
+}
+.pmmd__error {
+  color: var(--p-amplified);
+  font-size: var(--sl-text-xs);
+  white-space: pre-wrap;
+}
+
+/* ---------- verdict badges, shared vocabulary across variants ---------- */
+.pverdict {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: var(--sl-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid currentcolor;
+}
+.pverdict[data-verdict='Solved'] {
+  color: var(--p-solved);
+  background: color-mix(in oklab, var(--p-solved) 14%, transparent);
+}
+.pverdict[data-verdict='Holding'] {
+  color: var(--p-holding);
+  background: color-mix(in oklab, var(--p-holding) 14%, transparent);
+}
+.pverdict[data-verdict='Split'] {
+  color: var(--p-split);
+  background: color-mix(in oklab, var(--p-split) 14%, transparent);
+}
+.pverdict[data-verdict='Amplified'] {
+  color: var(--p-amplified);
+  background: color-mix(in oklab, var(--p-amplified) 14%, transparent);
+}
+
+/* ---------- source chip ---------- */
+.pchip {
+  display: inline-block;
+  font-family: var(--sl-font-mono);
+  font-size: 0.75rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.25rem;
+  padding: 0 0.35rem;
+  color: var(--sl-color-gray-2);
+  white-space: nowrap;
+}
+
+/* The prototype route asks for the whole canvas. Scoped with :has() so the
+   control page keeps Starlight's normal reading measure. */
+body:has(.pfull) .sl-container,
+body:has(.pfull) .sl-markdown-content {
+  max-width: none;
+}
+body:has(.pfull) main {
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}

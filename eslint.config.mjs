@@ -3,7 +3,9 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['node_modules/**', 'dist/**', 'coverage/**', '.archgate/**'] },
+  // `prototype/**` is throwaway code held to no production standard — the same
+  // opt-in-by-path stance markdown-harness.config.yaml takes for governance.
+  { ignores: ['node_modules/**', 'dist/**', 'coverage/**', '.archgate/**', 'prototype/**'] },
   {
     files: ['**/*.ts'],
     extends: [js.configs.recommended, tseslint.configs.recommended, tseslint.configs.stylistic],

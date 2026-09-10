@@ -1,0 +1,18 @@
+{
+  "name": "starlight-presentation-prototype",
+  "private": true,
+  "type": "module",
+  "//": "THROWAWAY PROTOTYPE \u2014 see prototype/starlight-presentation/README.md",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "build:pages": "PROTOTYPE_BASE=/ai-coaching-hub astro build"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.0",
+    "astro": "7.3.2",
+    "mermaid": "11.17.2"
+  }
+}

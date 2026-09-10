@@ -1,99 +1,118 @@
-# Prototype — the talk as a Starlight page
+# THROWAWAY PROTOTYPE — prototype 2: hub + two modules, on two stacks
 
-> **Throwaway.** Written to answer one question and then be deleted. Nothing here is held to
-> production standard: no tests, minimal error handling, and the root toolchain
-> (eslint, prettier, knip, tsc) is configured to ignore `prototype/**` on purpose.
+> **This is not production code.** It lives on a `prototype/**` branch, is never merged to
+> `main`, and exists only to answer a question. The answer belongs on issue **#1**.
 
 ## The question
 
-**What should a page about the 2026-09-15 all-hands talk look like?** Specifically: which
-visualisations carry the argument, and what shape should the table of contents take?
+Han, verbatim:
 
-Three variants on the single `/` route, switchable via `?variant=A|B|C`. Content is identical
-in all three — only layout, information hierarchy and the table of contents change.
+> "I'm really right now trying to find out if I want to stick with astro and starlight."
 
-| Variant | Name            | Primary affordance                     | Its table of contents         |
-| ------- | --------------- | -------------------------------------- | ----------------------------- |
-| **A**   | Script          | Read the talk top to bottom            | Sticky nested rail, left      |
-| **B**   | Run of show     | Drive it on the day; know what to cut  | The timing table itself       |
-| **C**   | Argument        | Trace every claim to its source        | A claim ledger, grouped by source document |
+**Deliberate deviation from the `/prototype` skill.** Neither of its branches fits. The LOGIC
+branch wants a state machine; the UI branch wants several looks on one route. Han said
+look-and-feel is explicitly *not* the focus. So the variant axis is repointed from **visual
+variants** to **stack variants**: the same content rendered twice, once on Starlight and once on
+plain Astro, sharing one kit.
 
 ## Run it
 
-From the repo root, one command:
-
-```sh
-npm run prototype          # installs, then serves http://localhost:4321
-npm run prototype:build    # builds to prototype/starlight-presentation/dist for GitHub Pages
+```bash
+npm run prototype          # from the repo root — dev server on :4321
+npm run prototype:build    # production build at the /ai-coaching-hub base + isolation check
 ```
 
-Cycle variants with the floating bar, the <kbd>←</kbd> / <kbd>→</kbd> keys, or the URL.
+From inside `prototype/starlight-presentation/`:
 
-## What it turned up
+```bash
+npm run dev
+npm run build              # build + verify-isolation
+npm run check              # astro check (0 errors expected)
+npm run verify:isolation   # the guard, standalone
+```
 
-1. **The governed file needs no copy.** `src/content.config.ts` points Starlight's docs
-   collection straight at `docs/presentations/`. The OKF frontmatter already carries `title`
-   and `description` — all Starlight requires — so the remaining OKF fields only need
-   *declaring* so the schema stops rejecting them as unknown keys. Edit the real script,
-   reload, see it. No sync step and nothing to drift. The route rendering it is linked from
-   the banner as a control: what you get with zero design work.
-   - Sharp edge: `<StarlightPage>` validates *its own* frontmatter against that same extended
-     schema, so every extended field must be `.optional()` — including `type`. A required
-     `type: 'presentation'` breaks every custom page in the project.
-2. **Mermaid renders client-side, so `/dist` stays pure static.** No headless browser at build
-   time, nothing for Pages to run. Diagrams render lazily per visible variant, and are thrown
-   away and redrawn when Starlight flips `data-theme` (verified: all 8 redraw on flip).
-3. **Two mermaid diagram types needed fighting.**
-   - The §2.1 missing-arrow image — the script's single most important visual — stacked
-     vertically *and reversed* on the first attempt, which destroys a comparison whose whole
-     point is "the absence in the **right-hand** panel". Fixed by dropping the per-subgraph
-     `direction` and adding an invisible `~~~` link to pin the ordering. Both panels carry
-     equal node counts so the difference reads as a missing arrow, not a smaller box.
-   - Mermaid's default cluster fill is a hard yellow that fights every Starlight palette;
-     `clusterBkg: 'transparent'` in `themeVariables` fixes it in both themes.
-4. **`timeline` ignores theme tokens.** It keeps its own purple/yellow section palette. Legible,
-   but it will not match a brand palette without patching mermaid's CSS.
-5. **Base-path links are the real GitHub Pages risk**, exactly as `docs/research/starlight-and-stack.md`
-   predicted. Starlight's own links compose with `base` correctly; hand-written ones do not.
-   The one hand-written link here goes through `import.meta.env.BASE_URL`. Note `new URL()` is
-   no help — `BASE_URL` is a path, not an absolute URL.
+## The seven routes
 
-## Deliberate deviations from the prototype skill
+| Route | Stack | What it is |
+| --- | --- | --- |
+| `/` | Starlight | Hub — editorial single column, modelled on `coaching-content/index.html` |
+| `/talk` | Starlight | Module 1 — the 2026-09-15 talk, still `?variant=A\|B\|C` |
+| `/token-101` | Starlight | Module 2 — the 18-beat scroll tower |
+| `/bare/` | plain Astro | Hub, no Starlight |
+| `/bare/talk` | plain Astro | Module 1, no Starlight |
+| `/bare/token-101` | plain Astro | Module 2, no Starlight |
+| **`/findings`** | Starlight | **The scorecard. Start here.** |
 
-- **The switcher is not hidden in production builds.** The skill hides it so a stray merge cannot
-  ship it to users. Here the built `/dist` *is* the review artifact — hiding the bar would make the
-  hosted site useless — so it stays visible and the PROTOTYPE banner carries the warning instead.
-- **Sub-shape B (a new route) rather than A (an existing page).** The skill prefers mounting variants
-  inside a real page. This repo has no site at all yet, so there was no page to sit inside.
+Plus `/2026-09-15-…` — the governed markdown rendered as-is by Starlight, the control.
 
-## Verdict
-
-_Unanswered — for Han to fill in._
-
-- Winning variant:
-- Bits worth stealing from the others:
-- Which diagrams earn a place in the deck (spec is #38):
-
-Once answered: fold the winner into real code, record the answer on the implementation issue, and
-leave this branch as the pointer. `main` keeps only the validated decision.
+Two switchers coexist by design: **stack** at the top, **variant** at the bottom on `/talk`.
 
 ## Layout
 
 ```
-astro.config.mjs              starlight config; base via PROTOTYPE_BASE
-src/content.config.ts         docs collection -> ../../docs/presentations (the real file)
-src/talk.ts                   talk metadata, failure modes, trim order, corrections
-src/sections.ts               per-section theses, beats, evidence
-src/diagrams.ts               13 mermaid sources
-src/pages/index.astro         the one route; mounts all three variants
-src/components/
-  Mermaid.astro               client-side renderer, theme-aware, lazy per variant
-  VariantSwitcher.astro       floating bar, ?variant=, arrow keys
-  PrototypeBanner.astro       throwaway warning + links to source and control
-  VariantAScript.astro        variant A, self-contained layout
-  VariantBRunOfShow.astro     variant B, self-contained layout
-  VariantCArgument.astro      variant C, self-contained layout
+src/kit/                 the controlled variable — consumes ONLY --k-*
+  tokens.css             101 lines, literal light+dark  (the bare baseline)
+  tokens-starlight.css    49 lines, remaps --k-* from --sl-*  (loaded via customCss)
+  format.ts              one mmss, countUp, usd
+  module.ts              LearningModule — deliberately does not model the body
+  primitives/            15 files, each scoped from measured duplication
+  tower/                 engine.ts (ported wholesale), Tower/Beat/TowerToc/Sources, beats.ts
+  beats/                 S1_1 … S8_2 — 18 beat components
+  animation.css          513 lines, ported UNTOUCHED from the harvest
+src/layouts/BareLayout.astro    161 lines — everything Starlight gave for free
+src/components/          page structure + prototype 1's three variants
+scripts/verify-isolation.mjs    the guard that keeps the experiment honest
 ```
 
-Each variant owns its full layout in a scoped `<style>` block. Only `Mermaid.astro` is shared,
-because it is infrastructure rather than layout — a shared layout would defeat the point.
+**Guard rail** (from the skill's UI.md): the kit owns leaf primitives and beat content,
+**never page structure**. On the stack axis the rule is stronger — the kit is the controlled
+variable, so if a primitive needed a Starlight-only feature that would be a *finding*, not a
+branch. It never did.
+
+## Why one Astro project is safe
+
+Verified, not assumed. Starlight ships **no `injectScript`**; its CSS arrives via
+`virtual:starlight/user-css`, imported by its own `Page.astro`. A route that never imports
+Starlight gets no Starlight CSS and no `customCss` either. `scripts/verify-isolation.mjs` asserts
+this on every build — including that the bare tree is still *styled*, because a page with zero
+`--k-*` refs is broken, not clean.
+
+The one thing that does cross is Astro's own 2.5 KB prefetch module, which Starlight enables
+project-wide (`dist/index.js:94`). Zero Starlight code in it.
+
+## What the first build caught
+
+Prototype 1's variants looked stack-agnostic and were not. Two independent Starlight couplings,
+**neither visible in the page HTML** — both hid in external CSS bundles:
+
+1. **Tokens** — all three variants referenced `--sl-*` directly (39 / 37 / 29 call sites, 105 refs
+   emitted). Migrated to `--k-*`.
+2. **Delivery** — `prototype.css` shipped only through `customCss`, so `/bare/talk` rendered the
+   switcher, banner, chips and verdict badges with no styles at all. Split into
+   `styles/chrome.css` (both trees) and `styles/starlight-only.css`.
+
+Lesson: *"is this portable?"* is not answerable by reading. Hence the build-time check.
+
+## Fidelity notes
+
+- **S8.1 / S8.2 are restored.** They are commented out in the harvest
+  (`ai-token-economy-101/index.html:3675–3833`), so the live page ships **16** beats, not the 18 its
+  own data attributes describe. Restored because the closer is the payoff of the argument.
+- **daisyUI dropped** — it sets `data-theme` on `<html>` across 35 themes and Starlight owns that
+  exact attribute. `badge` ×91, `card` ×45, `tooltip` ×42, `btn` ×14 rewritten onto the kit.
+- **The TOC is server-rendered**; the harvest injected it as an `innerHTML` string, so it did not
+  exist without JS and Pagefind never saw it.
+- **Reveal-on-enter is progressive**; the harvest shipped `opacity-0` in the markup, so with JS off
+  the page was blank.
+- **scroll-snap is a prop** — on for `/bare/token-101`, off for `/token-101`. The harvest's tower
+  owned the page scroller; Starlight does not give it up.
+- **`loop-engineering-101`** is a third page in that repo, out of scope here, listed as a
+  coming-soon placeholder.
+
+## Boundaries
+
+- Throwaway. Never merged to `main`.
+- Does **not** start #7 (gated on #5/#6). The verdict pointer belongs on **#1** (and #5/#6),
+  **not #10** — #10 is the corpus epic and explicitly excludes Astro/Starlight/the site/i18n/Pages.
+- No tests, no error handling beyond runnable, no persistence.
+- **The verdict section on `/findings` is left blank for Han.**

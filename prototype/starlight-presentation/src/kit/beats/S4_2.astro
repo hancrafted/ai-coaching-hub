@@ -1,0 +1,130 @@
+---
+// S4.2 — the U-shaped attention curve, drawn with a stroke-dashoffset sweep,
+// then the middle blurs. Ported from presentation.js:s4-2 including the
+// getTotalLength() + forced-layout trick.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+
+const MIDDLE = ['[msg 12: read utils.js]', '[msg 13: modify api.js]', '[msg 14: read config.json]'];
+---
+
+<div class="s42">
+  <BeatHeader code="S4.2" section="Managing Context">
+    <h2 class="s42__h">How key instructions get <em>lost in the middle.</em></h2>
+  </BeatHeader>
+
+  <p class="s42__lede">
+    It's not a quirk — researchers measure a U-shaped attention curve<Cite n={2} />, an uncanny
+    echo of human memory. Models attend hardest to the <strong>beginning</strong> and the
+    <strong>most recent</strong>; the middle blurs. A critical instruction buried ten messages back
+    may as well not be there.
+  </p>
+
+  <figure class="s42__fig">
+    <svg viewBox="0 0 400 120" class="s42__svg" role="img" aria-label="U-shaped attention curve: high at the start and end, low in the middle">
+      <path
+        class="s4-2-curve"
+        d="M10,20 C70,20 90,100 200,100 C310,100 330,20 390,20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+    </svg>
+    <div class="s42__ends">
+      <span class="s4-2-anno s42__anno">Primacy<em>the setup sticks</em></span>
+      <span class="s4-2-anno s42__anno s42__anno--mid">The lost middle</span>
+      <span class="s4-2-anno s42__anno">Recency<em>the latest is vivid</em></span>
+    </div>
+  </figure>
+
+  <ol class="s42__msgs">
+    <li class="s42__msg s42__msg--edge">
+      <span class="s42__mk">System prompt</span> "You are an expert coder…"
+    </li>
+    {MIDDLE.map((m) => <li class="s4-2-mid s42__msg">{m}</li>)}
+    <li class="s42__msg s42__msg--edge">
+      <span class="s42__mk">Latest request</span> "Why is the build failing?"
+    </li>
+  </ol>
+
+  <p class="s42__human">
+    Same as people: you recall the <strong>first and last</strong> speakers in a long meeting, not
+    the ones in between. Psychologists call it the serial-position effect<Cite n={5} /> — primacy +
+    recency — and the peak-end rule is its cousin.
+  </p>
+
+  <p class="s4-2-badge s42__badge">
+    <strong>Auto-compaction</strong> claws some back — partial, not guaranteed.<Cite n={6} />
+  </p>
+</div>
+
+<style>
+  .s42__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s42__h em { font-style: normal; color: var(--k-accent-high); }
+  .s42__lede { margin-block: 1.25rem 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s42__fig { margin: 0 0 1.5rem; }
+  .s42__svg { width: 100%; max-width: 34rem; color: var(--k-accent); display: block; }
+  .s42__ends { display: flex; justify-content: space-between; gap: 1rem; max-width: 34rem; }
+  .s42__anno { display: flex; flex-direction: column; font-size: var(--k-text-xs); font-weight: 700; color: var(--k-accent-high); opacity: 0; transition: opacity 400ms; }
+  .s42__anno.is-shown { opacity: 1; }
+  .s42__anno em { font-style: normal; font-weight: 400; color: var(--k-fg-subtle); }
+  .s42__anno--mid { color: var(--k-fg-faint); align-self: flex-end; }
+  .s42__msgs { display: grid; gap: 0.35rem; margin: 0 0 1.5rem; padding: 0; list-style: none; max-width: 34rem; }
+  .s42__msg { border: 1px solid var(--k-border); border-radius: var(--k-radius-sm); padding: 0.4rem 0.6rem; font-size: var(--k-text-sm); font-family: var(--k-font-mono); }
+  .s42__msg--edge { border-color: color-mix(in oklab, var(--k-accent) 50%, transparent); background: color-mix(in oklab, var(--k-accent) 8%, transparent); }
+  .s42__mk { display: block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--k-accent-high); }
+  .s4-2-mid { transition: opacity 500ms, filter 500ms; }
+  .s4-2-mid.is-blurred { opacity: 0.3; filter: blur(2px); }
+  .s42__human { color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s42__badge { margin-block-start: 1.25rem; border-inline-start: 3px solid var(--k-holding); padding: 0.4rem 0 0.4rem 0.85rem; font-size: var(--k-text-sm); color: var(--k-fg-muted); opacity: 0; scale: 0.95; transition: opacity 400ms, scale 400ms; }
+  .s42__badge.is-shown { opacity: 1; scale: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .s42__anno, .s4-2-mid, .s42__badge { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  registerActivate('s4-2', (reduced) => {
+    const container = document.getElementById('s4-2');
+    if (!container) return;
+    const curve = container.querySelector<SVGPathElement>('.s4-2-curve');
+    const mids = container.querySelectorAll('.s4-2-mid');
+    const annos = container.querySelectorAll('.s4-2-anno');
+    const badge = container.querySelector('.s4-2-badge');
+
+    const blurMids = () => {
+      for (const m of mids) m.classList.add('is-blurred');
+    };
+    const showAnnos = () => {
+      for (const a of annos) a.classList.add('is-shown');
+    };
+    const showBadge = () => badge?.classList.add('is-shown');
+
+    if (curve) {
+      const len = curve.getTotalLength();
+      curve.style.strokeDasharray = String(len);
+      if (reduced) {
+        curve.style.strokeDashoffset = '0';
+      } else {
+        curve.style.strokeDashoffset = String(len);
+        void curve.getBoundingClientRect(); // force layout before transitioning
+        curve.style.transition = 'stroke-dashoffset 1400ms ease-in-out';
+        requestAnimationFrame(() => {
+          curve.style.strokeDashoffset = '0';
+        });
+      }
+    }
+
+    if (reduced) {
+      blurMids();
+      showAnnos();
+      showBadge();
+      return;
+    }
+    window.setTimeout(showAnnos, 600);
+    window.setTimeout(blurMids, 900);
+    window.setTimeout(showBadge, 1600);
+  });
+</script>

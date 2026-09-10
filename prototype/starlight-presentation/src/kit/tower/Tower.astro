@@ -23,9 +23,10 @@ const { snap = true } = Astro.props;
 </style>
 
 <script>
-  import { init } from './engine';
+  import { start } from './engine';
   // Marks the tower as JS-driven so beats may start hidden (see Beat.astro),
-  // then hands off to the ported engine.
+  // then hands off to the ported engine. `start()` defers by one rAF so beat
+  // registration order cannot matter — see the note in engine.ts.
   document.getElementById('tower')?.classList.add('is-js');
-  init();
+  start();
 </script>

@@ -1,0 +1,123 @@
+---
+// S5.1 — the agentic loop compounding to ~73k tokens. The cumulative markers
+// chain: each counts on from the previous total, so the context visibly
+// compounds. Ported from presentation.js:s5-1 (480ms each, 140ms apart).
+import BeatHeader from '../primitives/BeatHeader.astro';
+
+interface Step { label: string; note?: string; delta: number; cum?: number }
+const STEPS: Step[] = [
+  { label: 'System prompt', note: 'rules, tools, memory', delta: 35000 },
+  { label: 'User query', note: 'the bug report', delta: 1000, cum: 36000 },
+  { label: 'Thought #1', delta: 4000 },
+  { label: 'Tool call · read file #1', delta: 200 },
+  { label: 'Tool result · file #1 contents', delta: 12000, cum: 52200 },
+  { label: 'Thought #2', delta: 4000 },
+  { label: 'Tool call · read file #2', delta: 200 },
+  { label: 'Tool result · file #2 contents', delta: 9000, cum: 65400 },
+  { label: 'Thought #3', delta: 4000 },
+  { label: 'Tool call · code patch', delta: 3000 },
+  { label: 'Tool result · write success', delta: 50, cum: 72450 },
+  { label: 'Final response', delta: 1000, cum: 73450 },
+];
+---
+
+<div class="s51">
+  <BeatHeader code="S5.1" section="Cost of Agentic AI">
+    <h2 class="s51__h">One small bug fix compounds to <em>~73,000 tokens of context.</em></h2>
+  </BeatHeader>
+
+  <p class="s51__lede">
+    Agentic AI runs in a loop: think, call a tool, read the result, think again. Every step is
+    appended to the context — and the whole thing is re-sent on the next step. Watch the running
+    total climb.
+  </p>
+
+  <ol class="s51__steps">
+    {
+      STEPS.map((s) => (
+        <>
+          <li class="s5-step s51__step">
+            <span class="s51__label">
+              {s.label}
+              {s.note && <span class="s51__note"> · {s.note}</span>}
+            </span>
+            <span class="s51__delta">+{s.delta.toLocaleString('en-US')}</span>
+          </li>
+          {s.cum && (
+            <li class="s51__cumrow">
+              <span class="s51__cumlabel">context</span>
+              <span class="s51__cum" data-cum={s.cum}>0</span>
+            </li>
+          )}
+        </>
+      ))
+    }
+  </ol>
+
+  <p class="s51__total">
+    <span>Total context · one bug fix</span>
+    <span class="s51__cum s51__cum--big" data-cum="73450">0</span>
+  </p>
+
+  <p class="s51__after">
+    ~73k tokens sounds cheap. But because every step re-sends the whole context, the model actually
+    reads far more than that — which is where the bill really comes from.
+  </p>
+  <p class="s51__next">Next: what it costs.</p>
+  <p class="s51__caveat">Illustrative example flow · numbers rounded</p>
+</div>
+
+<style>
+  .s51__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s51__h em { font-style: normal; color: var(--k-amplified); }
+  .s51__lede { margin-block: 1.25rem 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s51__steps { margin: 0; padding: 0; list-style: none; max-width: 40rem; }
+  .s51__step { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; padding: 0.3rem 0.6rem; border-inline-start: 2px solid var(--k-border); font-size: var(--k-text-sm); opacity: 0; translate: 0 0.5rem; transition: opacity 350ms, translate 350ms; }
+  .s51__step.is-shown { opacity: 1; translate: 0 0; }
+  .s51__note { color: var(--k-fg-subtle); }
+  .s51__delta { font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; color: var(--k-holding); white-space: nowrap; }
+  .s51__cumrow { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin-block: 0.35rem 0.75rem; padding: 0.25rem 0.6rem; border-inline-start: 2px solid var(--k-accent); background: color-mix(in oklab, var(--k-accent) 8%, transparent); }
+  .s51__cumlabel { font-family: var(--k-font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--k-fg-subtle); }
+  .s51__cum { font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--k-accent-high); }
+  .s51__total { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; max-width: 40rem; margin-block-start: 1.25rem; border-block-start: 2px solid var(--k-amplified); padding-block-start: 0.75rem; font-weight: 700; }
+  .s51__cum--big { font-size: var(--k-text-2xl); color: var(--k-amplified); }
+  .s51__after { margin-block-start: 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s51__next { font-weight: 600; }
+  .s51__caveat { font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  @media (prefers-reduced-motion: reduce) { .s51__step { transition: none; } }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp, int } from '../format';
+
+  registerActivate('s5-1', (reduced) => {
+    const steps = Array.from(document.querySelectorAll('#s5-1 .s5-step'));
+    const cums = Array.from(document.querySelectorAll<HTMLElement>('#s5-1 [data-cum]'));
+    const reveal = (el: Element) => el.classList.add('is-shown');
+
+    if (reduced) {
+      for (const el of steps) reveal(el);
+      for (const el of cums) el.textContent = int(Number(el.dataset.cum));
+      return;
+    }
+
+    steps.forEach((el, i) => window.setTimeout(() => reveal(el), 100 + i * 120));
+
+    // Walk the cumulative markers so each carries on from the previous total.
+    let from = 0;
+    const run = (i: number) => {
+      if (i >= cums.length) return;
+      const target = Number(cums[i].dataset.cum);
+      countUp(cums[i], target, {
+        from,
+        duration: 480,
+        onDone: () => {
+          from = target;
+          window.setTimeout(() => run(i + 1), 140);
+        },
+      });
+    };
+    window.setTimeout(() => run(0), 500 + steps.length * 120);
+  });
+</script>

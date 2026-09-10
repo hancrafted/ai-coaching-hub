@@ -47,14 +47,24 @@ export function fireActivate(id: string): void {
   fn(reduceMotion());
 }
 
-// --- init is deferred so every beat module has registered before we start.
-// All component scripts land in one bundle evaluated synchronously, so a single
-// rAF hop is enough; no ordering assumptions between modules.
+// --- Init is ALWAYS deferred by one rAF, so every beat module has registered
+// before the observer starts. This matters: Astro emits each component
+// <script> as its own module, and module scripts run in document order. Today
+// Tower's script happens to be emitted last, but that is incidental — it
+// depends on where <Tower> sits in the component tree. If init ran before a
+// beat registered, the observer could pass over an already-visible beat and no
+// further intersection event would ever fire, so its animation would be lost.
+// `start()` is therefore the only entry point Tower uses.
 let scheduled = false;
 function scheduleInit(): void {
   if (scheduled || typeof window === 'undefined') return;
   scheduled = true;
   requestAnimationFrame(() => init());
+}
+
+/** Entry point for the Tower shell. Never calls init() synchronously. */
+export function start(): void {
+  scheduleInit();
 }
 
 let started = false;

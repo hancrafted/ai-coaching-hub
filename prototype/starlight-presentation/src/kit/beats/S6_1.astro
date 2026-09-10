@@ -1,0 +1,173 @@
+---
+// S6.1 — the real model stack, revealed left→right so the eye reads it as a
+// pipeline. Stagger (220ms per column, arrows +130ms) ported from
+// presentation.js:s6-1.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Chip from '../primitives/Chip.astro';
+
+const TIERS = [
+  { t: 'Frontier', d: 'Opus — heavy reasoning, sparingly', tone: 'frontier' },
+  { t: 'Workhorse', d: 'Sonnet · Gemini Pro', tone: 'workhorse' },
+  { t: 'Economy', d: 'Haiku · Flash — cheap, use freely', tone: 'economy' },
+];
+
+interface Row {
+  task: string;
+  /** CLI vs Desktop, shown as a micro-label. */
+  where?: string;
+  note?: string;
+  model: string;
+  /** Trailing aside, e.g. the cross-reference back to S5.2's price table. */
+  tail?: string;
+}
+interface Phase {
+  n: string;
+  title: string;
+  where: string;
+  rows: Row[];
+}
+
+const PHASES: Phase[] = [
+  {
+    n: '1',
+    title: 'Ideation & Refinement',
+    where: 'Web chat · flat-rate',
+    rows: [
+      { task: 'Simple research', model: 'Gemini 3.5 Flash (High)' },
+      { task: 'Q&A', model: 'Gemini 3.5 Flash (High)' },
+      { task: 'Initial grill', note: 'stress-test an idea before committing', model: 'Gemini 3.1 Pro (High)' },
+      { task: 'Voice notes → text', note: 'custom workflow via Hermes and Discord during my commute', model: 'DeepSeek V4 Pro', tail: 'the $0.11 row from the price comparison' },
+    ],
+  },
+  {
+    n: '2',
+    title: 'Specs & Planning',
+    where: 'Claude Code CLI · Desktop',
+    rows: [
+      { task: 'Write PRD + grill', where: 'CLI', model: 'Opus 4.8', note: 'complex — architecture, initial project setup' },
+      { task: '', model: 'Gemini 3.1 Pro (High)', note: 'medium — feature refinement, medium changes' },
+      { task: 'Deep research', where: 'CLI', model: 'Sonnet 5 → Opus 4.8', note: 'search → reasoning' },
+      { task: 'Format specs · type-check', where: 'Desktop', model: 'Sonnet 5' },
+    ],
+  },
+  {
+    n: '3',
+    title: 'Execution',
+    where: 'All CLI',
+    rows: [
+      { task: 'Commits', model: 'Gemini 3.5 Flash (Low)' },
+      { task: 'Coding', model: 'Sonnet 5 or Gemini 3.1 Pro (High)' },
+      { task: 'Code / file exploration', model: 'Haiku 4.5 or Gemini 3.5 Flash (High)' },
+    ],
+  },
+];
+---
+
+<div class="s61">
+  <BeatHeader code="S6.1" section="Model Tiers">
+    <h2 class="s61__h">My real model stack: <em>one workflow, many models.</em></h2>
+  </BeatHeader>
+
+  <p class="s61__lede">
+    This is how I actually route a single project — left to right, from first idea to shipped code.
+    Each phase pulls a different mix: flat-rate web chat for cheap thinking, frontier reasoning
+    where the specs decide everything, then a lean CLI stack for execution. The model shifts as the
+    stakes do.
+  </p>
+
+  <div class="s61__tiers">
+    <p class="s61__tlabel">Capability tier</p>
+    {TIERS.map((t) => (
+      <p class="s61__tier" data-tone={t.tone}><strong>{t.t}</strong> — {t.d}</p>
+    ))}
+  </div>
+
+  <div class="s61__pipeline">
+    {
+      PHASES.map((p, i) => (
+        <>
+          {i > 0 && <span class="phase-arrow s61__arrow" aria-hidden="true">→</span>}
+          <div class="phase-col s61__col">
+            <p class="s61__pn">{p.n}</p>
+            <h3 class="s61__pt">{p.title}</h3>
+            <p class="s61__pw"><Chip>{p.where}</Chip></p>
+            <ul class="s61__rows">
+              {p.rows.map((r) => (
+                <li>
+                  {r.task && <span class="s61__task">{r.task}</span>}
+                  {r.where && <span class="s61__rwhere">{r.where}</span>}
+                  {r.note && <span class="s61__rnote">{r.note}</span>}
+                  <span class="s61__model">{r.model}</span>
+                  {r.tail && <span class="s61__rnote">— {r.tail}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      ))
+    }
+  </div>
+
+  <p class="s61__pattern">
+    The pattern: flat-rate and economy models handle anything that doesn't need judgment; frontier
+    reasoning is reserved for the few steps where the stakes justify it. Same discipline whether
+    you're writing the code or signing the invoice.
+  </p>
+</div>
+
+<style>
+  .s61__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s61__h em { font-style: normal; color: var(--k-accent-high); }
+  .s61__lede { margin-block: 1.25rem 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s61__tiers { margin-block-end: 1.75rem; }
+  .s61__tlabel { margin: 0 0 0.4rem; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--k-fg-subtle); }
+  .s61__tier { margin: 0.2rem 0; font-size: var(--k-text-sm); color: var(--k-fg-muted); border-inline-start: 3px solid; padding-inline-start: 0.6rem; }
+  .s61__tier[data-tone='frontier'] { border-color: var(--k-amplified); }
+  .s61__tier[data-tone='workhorse'] { border-color: var(--k-accent); }
+  .s61__tier[data-tone='economy'] { border-color: var(--k-solved); }
+  .s61__pipeline { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.75rem; }
+  .s61__col { flex: 1 1 16rem; min-width: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius); padding: 1rem; opacity: 0; translate: 0 1rem; transition: opacity 450ms ease-out, translate 450ms ease-out; }
+  .s61__col.is-shown { opacity: 1; translate: 0 0; }
+  .s61__arrow { align-self: center; color: var(--k-fg-faint); font-size: var(--k-text-xl); opacity: 0; transition: opacity 300ms; }
+  .s61__arrow.is-shown { opacity: 1; }
+  .s61__pn { margin: 0; font-family: var(--k-font-mono); font-size: 0.7rem; color: var(--k-accent-high); }
+  .s61__pt { font-size: var(--k-text-lg); margin: 0.2rem 0 0.5rem; }
+  .s61__pw { margin: 0 0 0.75rem; }
+  .s61__rows { margin: 0; padding: 0; list-style: none; font-size: var(--k-text-sm); }
+  .s61__rows li { border-block-start: 1px solid var(--k-border); padding-block: 0.5rem; }
+  .s61__task { display: block; font-weight: 600; }
+  .s61__rwhere { display: inline-block; margin-inline-end: 0.35rem; font-family: var(--k-font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--k-fg-subtle); }
+  .s61__rnote { display: block; font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  .s61__model { display: block; font-family: var(--k-font-mono); font-size: var(--k-text-xs); color: var(--k-accent-high); }
+  .s61__pattern { margin-block-start: 1.75rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  @media (prefers-reduced-motion: reduce) { .s61__col, .s61__arrow { transition: none; } }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  registerActivate('s6-1', (reduced) => {
+    const container = document.getElementById('s6-1');
+    if (!container) return;
+    const cols = container.querySelectorAll<HTMLElement>('.phase-col');
+    const arrows = container.querySelectorAll<HTMLElement>('.phase-arrow');
+
+    if (reduced) {
+      for (const el of [...cols, ...arrows]) {
+        el.style.transitionDuration = '0ms';
+        el.classList.add('is-shown');
+      }
+      return;
+    }
+    // Left → right, arrows easing in between, so it reads as a pipeline.
+    window.setTimeout(() => {
+      cols.forEach((col, i) => {
+        col.style.transitionDelay = `${i * 220}ms`;
+        col.classList.add('is-shown');
+      });
+      arrows.forEach((a, i) => {
+        a.style.transitionDelay = `${i * 220 + 130}ms`;
+        a.classList.add('is-shown');
+      });
+    }, 50);
+  });
+</script>

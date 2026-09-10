@@ -29,23 +29,33 @@ export interface CountUpOptions {
   duration?: number;
   format?: (n: number) => string;
   reduceMotion?: boolean;
+  /** Start value. S5.1 chains counters so each carries on from the last total. */
+  from?: number;
+  /** Fired when the count settles — S5.1 uses it to sequence the chain. */
+  onDone?: () => void;
 }
 
 /** Ported from coaching-content/presentation.js — the shared rAF helper behind
  *  every counting animation. `reduceMotion` short-circuits to the final value so
  *  a number is never left mid-count. */
 export function countUp(el: Element, to: number, options: CountUpOptions = {}): void {
-  const { duration = 900, format = int, reduceMotion = false } = options;
+  const { duration = 900, format = int, reduceMotion = false, from = 0, onDone } = options;
   if (reduceMotion || duration <= 0) {
     el.textContent = format(to);
+    onDone?.();
     return;
   }
   const start = performance.now();
   const step = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
     const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic, as in the original
-    el.textContent = format(to * eased);
-    if (t < 1) requestAnimationFrame(step);
+    el.textContent = format(from + (to - from) * eased);
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = format(to);
+      onDone?.();
+    }
   };
   requestAnimationFrame(step);
 }

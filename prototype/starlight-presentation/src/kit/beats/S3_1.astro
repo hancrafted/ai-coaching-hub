@@ -25,12 +25,15 @@ const BILLED = [
     Every token is roughly 3/4 of a word<Cite n={1} /> and represented as a unique number.
   </p>
 
+  {/* The quote crossfades into its own tokens on activate — the signature
+      moment of this beat. Both layers occupy the same grid cell so the swap
+      happens in place, as in the harvest. */}
   <figure class="s31__quote">
-    <blockquote>
+    <blockquote class="s3-1-text">
       "Insanity is doing the same thing over and over again and expecting different results."
     </blockquote>
-    <div class="s31__chips">
-      {QUOTE_TOKENS.map((t, i) => <span class="s31__chip" data-hue={i % 5}>{t}</span>)}
+    <div class="s3-1-tokens s31__chips">
+      {QUOTE_TOKENS.map((t, i) => <span class="token-chip s31__chip" data-hue={i % 5}>{t}</span>)}
     </div>
   </figure>
 
@@ -86,21 +89,47 @@ const BILLED = [
     max-width: 62ch;
   }
   .s31__quote {
+    display: grid;
     margin: 0 0 1.5rem;
+    min-height: 5.5rem;
   }
-  .s31__quote blockquote {
+  /* Both layers share one grid cell so the crossfade happens in place. */
+  .s3-1-text,
+  .s3-1-tokens {
+    grid-area: 1 / 1;
+  }
+  .s3-1-text {
     margin: 0;
     padding: 0;
     border: 0;
     font-size: var(--k-text-lg);
     line-height: 1.6;
     color: var(--k-fg);
+    transition: opacity 400ms ease-out;
+  }
+  .s3-1-tokens {
+    opacity: 0;
+    transition: opacity 400ms ease-out;
   }
   .s31__chips {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
-    margin-block-start: 1rem;
+    align-content: flex-start;
+  }
+  .s31__chips--live {
+    opacity: 1;
+  }
+  .token-chip {
+    opacity: 0;
+    translate: 0 0.5rem;
+    transition:
+      opacity 300ms ease-out,
+      translate 300ms ease-out;
+  }
+  .token-chip.is-shown {
+    opacity: 1;
+    translate: 0 0;
   }
   .s31__chips--live {
     min-height: 2.5rem;
@@ -204,6 +233,30 @@ const BILLED = [
 </style>
 
 <script>
+  import { registerActivate } from '../tower/engine';
+
+  // Ported from presentation.js:s3-1 — the quote fades out as its tokens
+  // stagger in (300ms + i*100), then the billing note follows.
+  registerActivate('s3-1', (reduced) => {
+    const container = document.getElementById('s3-1');
+    if (!container) return;
+    const textEl = container.querySelector<HTMLElement>('.s3-1-text');
+    const tokensEl = container.querySelector<HTMLElement>('.s3-1-tokens');
+    const chips = container.querySelectorAll('.token-chip');
+    const billed = container.querySelector<HTMLElement>('.s31__billed-h');
+    if (!textEl || !tokensEl) return;
+
+    textEl.style.opacity = '0';
+    tokensEl.style.opacity = '1';
+
+    if (reduced) {
+      for (const c of chips) c.classList.add('is-shown');
+      return;
+    }
+    chips.forEach((chip, i) => window.setTimeout(() => chip.classList.add('is-shown'), 300 + i * 100));
+    if (billed) window.setTimeout(() => billed.classList.add('is-shown'), 300 + chips.length * 100 + 200);
+  });
+
   // LIVE CONTROL — ported verbatim from presentation.js:1142.
   const input = document.getElementById('s31-input') as HTMLInputElement | null;
   const chipsEl = document.getElementById('s31-chips');

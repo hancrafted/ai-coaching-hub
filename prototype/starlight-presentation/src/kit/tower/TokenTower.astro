@@ -17,17 +17,50 @@ import S2_5 from '../beats/S2_5.astro';
 import S3_1 from '../beats/S3_1.astro';
 import S3_2 from '../beats/S3_2.astro';
 import S3_3 from '../beats/S3_3.astro';
+import S4_1 from '../beats/S4_1.astro';
+import S4_2 from '../beats/S4_2.astro';
+import S4_3 from '../beats/S4_3.astro';
+import S5_1 from '../beats/S5_1.astro';
+import S5_2 from '../beats/S5_2.astro';
+import S6_1 from '../beats/S6_1.astro';
+import S7_1 from '../beats/S7_1.astro';
+import S8_1 from '../beats/S8_1.astro';
+import S8_2 from '../beats/S8_2.astro';
 
 interface Props {
   snap?: boolean;
 }
 const { snap = true } = Astro.props;
 
-const CONTENT = { s1_1: S1_1, s2_1: S2_1, s2_2: S2_2, s2_3: S2_3, s2_4: S2_4, s2_5: S2_5, s3_1: S3_1, s3_2: S3_2, s3_3: S3_3 };
+const CONTENT = {
+  s1_1: S1_1,
+  s2_1: S2_1,
+  s2_2: S2_2,
+  s2_3: S2_3,
+  s2_4: S2_4,
+  s2_5: S2_5,
+  s3_1: S3_1,
+  s3_2: S3_2,
+  s3_3: S3_3,
+  s4_1: S4_1,
+  s4_2: S4_2,
+  s4_3: S4_3,
+  s5_1: S5_1,
+  s5_2: S5_2,
+  s6_1: S6_1,
+  s7_1: S7_1,
+  s8_1: S8_1,
+  s8_2: S8_2,
+};
 const titleOf = (section: string) =>
   BEAT_SECTIONS.find((s) => s.num === section)?.title ?? `Section ${section}`;
 const key = (id: string) => id.replace('-', '_') as keyof typeof CONTENT;
-const RENDERABLE = BEATS.filter((b) => CONTENT[key(b.id)]);
+// All 18 beats must have a component. Fail the BUILD rather than silently
+// render a short tower — a missing beat would otherwise look like a design
+// choice. (S8.1/S8.2 are commented out in the harvest; restored here.)
+const missing = BEATS.filter((b) => !CONTENT[key(b.id)]).map((b) => b.code);
+if (missing.length > 0) throw new Error(`TokenTower: no component for ${missing.join(', ')}`);
+const RENDERABLE = BEATS;
 ---
 
 <Tower snap={snap}>

@@ -1,0 +1,138 @@
+---
+// S4.1 — two lanes fill left-to-right; the agentic lane visibly outpaces chat.
+// Segment growth, the % tick and the end-state text are ported from
+// presentation.js:s4-1 (flexBasis growth, 320ms per segment).
+import BeatHeader from '../primitives/BeatHeader.astro';
+
+interface Seg { label: string; basis: number; tone: string }
+const LANES: Array<{ title: string; segs: Seg[] }> = [
+  { title: 'Plain chat', segs: [
+    { label: 'Boot-up', basis: 25, tone: 'boot' },
+    { label: 'Your messages', basis: 10, tone: 'user' },
+    { label: 'Model replies', basis: 12, tone: 'model' },
+  ] },
+  { title: 'Agentic coding', segs: [
+    { label: 'Boot-up', basis: 25, tone: 'boot' },
+    { label: '"Refactor this"', basis: 4, tone: 'user' },
+    { label: 'reads 12 files', basis: 22, tone: 'tool' },
+    { label: 'runs tests', basis: 10, tone: 'tool' },
+    { label: 'tool output', basis: 14, tone: 'tool' },
+    { label: 'applies patch', basis: 8, tone: 'model' },
+  ] },
+];
+const LEGEND = [
+  { t: 'boot', l: 'Boot-up (system · tools · skills · memory)' },
+  { t: 'user', l: 'Your messages' },
+  { t: 'model', l: 'Model replies' },
+  { t: 'tool', l: 'Tool calls · files read' },
+];
+---
+
+<div class="s41">
+  <BeatHeader code="S4.1" section="Managing Context">
+    <h2 class="s41__h">Context window is the model's <em>attention span.</em></h2>
+  </BeatHeader>
+
+  <p class="s41__lede">
+    Picture the context window as a person's focus across a workday. It never starts empty —
+    boot-up (system prompt, tools, skills, memory) already fills ~25% before you say a word; the
+    <code>/context</code> readout you just saw was ~30% committed before a single message. Then
+    every message resends the entire history, so the bar fills left to right: fresh at 9 AM,
+    running on fumes by 5. A plain chat stays light; an agent balloons fast.
+  </p>
+
+  <ul class="s41__legend">
+    {LEGEND.map((g) => <li><span class="s41__swatch" data-tone={g.t}></span>{g.l}</li>)}
+  </ul>
+
+  <div class="s41__lanes">
+    {
+      LANES.map((lane) => (
+        <div class="s4-1-lane s41__lane">
+          <div class="s41__lhead">
+            <h3 class="s41__lt">{lane.title}</h3>
+            <p class="s41__lstat">
+              <span class="s4-1-pct">25</span>% · <span class="s4-1-state">fresh</span>
+            </p>
+          </div>
+          <div class="s41__track">
+            {lane.segs.map((s) => (
+              <span class="s4-1-seg s41__seg" data-basis={s.basis} data-tone={s.tone} title={s.label} />
+            ))}
+          </div>
+          <ul class="s41__slabels">
+            {lane.segs.map((s) => <li>{s.label}</li>)}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="s41__clock"><span>9 AM · fresh</span><span>12 PM</span><span>3 PM</span><span>5 PM · full</span></p>
+</div>
+
+<style>
+  .s41__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s41__h em { font-style: normal; color: var(--k-accent-high); }
+  .s41__lede { margin-block: 1.25rem 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s41__legend { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin: 0 0 1.5rem; padding: 0; list-style: none; font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  .s41__legend li { display: flex; align-items: center; gap: 0.4rem; }
+  .s41__swatch { width: 0.75rem; height: 0.75rem; border-radius: 2px; }
+  .s41__swatch[data-tone='boot'], .s41__seg[data-tone='boot'] { background: var(--k-fg-faint); }
+  .s41__swatch[data-tone='user'], .s41__seg[data-tone='user'] { background: var(--k-accent); }
+  .s41__swatch[data-tone='model'], .s41__seg[data-tone='model'] { background: var(--k-split); }
+  .s41__swatch[data-tone='tool'], .s41__seg[data-tone='tool'] { background: var(--k-holding); }
+  .s41__lanes { display: grid; gap: 1.5rem; }
+  .s41__lhead { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .s41__lt { font-size: var(--k-text-lg); margin: 0 0 0.5rem; }
+  .s41__lstat { margin: 0; font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-size: var(--k-text-sm); color: var(--k-warn); }
+  .s41__track { display: flex; height: 1.5rem; border-radius: var(--k-radius-sm); background: var(--k-border); overflow: hidden; }
+  .s41__seg { flex-grow: 0; flex-shrink: 0; flex-basis: 0; transition: flex-basis 400ms ease-out; }
+  .s41__slabels { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0 0; padding: 0; list-style: none; font-size: 0.65rem; font-family: var(--k-font-mono); color: var(--k-fg-subtle); }
+  .s41__clock { display: flex; justify-content: space-between; margin-block-start: 1.5rem; padding-block-start: 0.5rem; border-block-start: 1px solid var(--k-border); font-family: var(--k-font-mono); font-size: 0.65rem; color: var(--k-fg-subtle); }
+  @media (prefers-reduced-motion: reduce) { .s41__seg { transition: none; } }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  registerActivate('s4-1', (reduced) => {
+    const container = document.getElementById('s4-1');
+    if (!container) return;
+    const lanes = container.querySelectorAll('.s4-1-lane');
+
+    const analyze = (lane: Element) => {
+      const segs = lane.querySelectorAll<HTMLElement>('.s4-1-seg');
+      const pctEl = lane.querySelector('.s4-1-pct');
+      const stateEl = lane.querySelector('.s4-1-state');
+      let sum = 0;
+      for (const seg of segs) sum += Number(seg.dataset.basis ?? 0);
+      return { segs, pctEl, stateEl, sum, endState: sum > 60 ? 'running on fumes' : 'still sharp' };
+    };
+    const info = Array.from(lanes).map(analyze);
+
+    if (reduced) {
+      for (const i of info) {
+        for (const seg of i.segs) seg.style.flexBasis = `${seg.dataset.basis}%`;
+        if (i.pctEl) i.pctEl.textContent = String(i.sum);
+        if (i.stateEl) i.stateEl.textContent = i.endState;
+      }
+      return;
+    }
+
+    // Both lanes run at once so the agentic lane visibly outpaces plain chat.
+    const stepMs = 320;
+    for (const i of info) {
+      let acc = 0;
+      i.segs.forEach((seg, idx) => {
+        window.setTimeout(() => {
+          seg.style.flexBasis = `${seg.dataset.basis}%`;
+          acc += Number(seg.dataset.basis ?? 0);
+          if (i.pctEl) i.pctEl.textContent = String(acc);
+        }, 200 + idx * stepMs);
+      });
+      window.setTimeout(() => {
+        if (i.stateEl) i.stateEl.textContent = i.endState;
+      }, 200 + i.segs.length * stepMs + 100);
+    }
+  });
+</script>

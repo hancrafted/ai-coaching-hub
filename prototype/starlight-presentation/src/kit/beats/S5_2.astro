@@ -1,0 +1,146 @@
+---
+// S5.2 — LIVE CONTROL 4 of 4: scale fixes/day, the daily spread scales with it.
+// Per-fix costs (COST_LOW 0.1126, COST_HIGH 1.5403) ported verbatim.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+import Panel from '../primitives/Panel.astro';
+
+const MODELS = [
+  { name: 'DeepSeek V4 Pro', rate: '$0.435 / $0.87 per 1M', cost: '$0.11', width: 7 },
+  { name: 'Gemini 3.5 Flash', rate: '$1.50 / $9.00 per 1M', cost: '$0.49', width: 32 },
+  { name: 'Claude Sonnet 5', note: 'intro rate', rate: '$2.00 / $10.00 per 1M', cost: '$0.62', width: 40 },
+  { name: 'Claude Opus 4.8', rate: '$5.00 / $25.00 per 1M', cost: '$1.54', width: 100 },
+];
+---
+
+<div class="s52">
+  <BeatHeader code="S5.2" section="Cost of Agentic AI">
+    <h2 class="s52__h">The same bug fix, <em>priced across models.</em></h2>
+  </BeatHeader>
+
+  <div class="s52__billed">
+    <Panel>
+      <p class="s52__bl">Billed input</p>
+      <p class="s52__bv">~226,000</p>
+      <p class="s52__bn">tokens — the ~73k context, re-sent on every step</p>
+    </Panel>
+    <Panel>
+      <p class="s52__bl">Billed output</p>
+      <p class="s52__bv">~16,400</p>
+      <p class="s52__bn">tokens — the model's thoughts, calls &amp; patch</p>
+    </Panel>
+  </div>
+
+  <p class="s52__trap">
+    The trap: you aren't billed for the context window capacity itself, but strictly for the actual
+    tokens processed. Because the model is stateless, each step requires re-sending the entire
+    history — meaning you pay for <strong>~226k input tokens just to fix one bug</strong>.
+  </p>
+
+  <ul class="s52__models">
+    {
+      MODELS.map((m) => (
+        <li class="s5-model-row s52__row">
+          <div class="s52__mhead">
+            <span class="s52__mname">
+              {m.name}
+              {m.note && <span class="s52__mnote"> · {m.note}</span>}
+            </span>
+            <span class="s52__mcost">{m.cost}</span>
+          </div>
+          <div class="s52__mtrack">
+            <div class="s5-bar s52__mbar" data-width={m.width}></div>
+          </div>
+          <p class="s52__mrate">{m.rate}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <Panel tone="raised" class="s52__control">
+    <p class="s52__spread">
+      <strong>~14× spread</strong> for identical output. At
+      <span id="s52-fixes" class="s52__n">50</span> fixes a day, that's roughly
+      <span id="s52-low" class="s52__n s52__n--low">$6</span> vs
+      <span id="s52-high" class="s52__n s52__n--high">$77</span> per developer per day — before
+      anyone's shipped a single feature. This is why routing (S6) matters.
+    </p>
+    <div class="s52__crow">
+      <label for="s52-slider" class="s52__clabel">fixes / day</label>
+      <input id="s52-slider" type="range" min="5" max="200" value="50" step="5" class="s52__range" aria-label="Bug fixes per day" />
+    </div>
+  </Panel>
+
+  <p class="s52__caveat">
+    List prices per 1M tokens, July 2026<Cite n={[7, 8, 9]} />. Sonnet 5 shown at the introductory
+    rate ($2 / $10 through Aug 31, 2026; $3 / $15 standard after)<Cite n={7} />. Prompt caching can
+    cut re-sent input cost by up to ~90%<Cite n={[7, 8]} /> — these are the un-cached figures.
+  </p>
+</div>
+
+<style>
+  .s52__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s52__h em { font-style: normal; color: var(--k-accent-high); }
+  .s52__billed { display: grid; gap: 1rem; margin-block: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .s52__bl { margin: 0; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--k-fg-subtle); }
+  .s52__bv { margin: 0.2rem 0 0; font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-size: var(--k-text-2xl); font-weight: 700; color: var(--k-warn); }
+  .s52__bn { margin: 0.2rem 0 0; font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  .s52__trap { color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s52__models { margin: 1.75rem 0 0; padding: 0; list-style: none; max-width: 42rem; }
+  .s52__row { margin-block-end: 1rem; opacity: 0; translate: 0 0.5rem; transition: opacity 350ms, translate 350ms; }
+  .s52__row.is-shown { opacity: 1; translate: 0 0; }
+  .s52__mhead { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+  .s52__mname { font-weight: 600; }
+  .s52__mnote { font-weight: 400; font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  .s52__mcost { font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--k-warn); }
+  .s52__mtrack { height: 0.5rem; margin-block-start: 0.35rem; border-radius: var(--k-radius-pill); background: var(--k-border); overflow: hidden; }
+  .s52__mbar { height: 100%; width: 0; border-radius: var(--k-radius-pill); background: var(--k-accent); transition: width 600ms ease-out; }
+  .s52__mrate { margin: 0.25rem 0 0; font-family: var(--k-font-mono); font-size: 0.65rem; color: var(--k-fg-subtle); }
+  .s52__control { margin-block-start: 1.5rem; }
+  .s52__spread { margin: 0; line-height: 1.7; color: var(--k-fg-muted); }
+  .s52__n { font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--k-fg); }
+  .s52__n--low { color: var(--k-solved); }
+  .s52__n--high { color: var(--k-amplified); }
+  .s52__crow { display: flex; align-items: center; gap: 0.75rem; margin-block-start: 1rem; }
+  .s52__clabel { flex-shrink: 0; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--k-fg-subtle); }
+  .s52__range { flex: 1; accent-color: var(--k-accent); }
+  .s52__caveat { margin-block-start: 1rem; font-size: var(--k-text-xs); line-height: 1.6; color: var(--k-fg-subtle); max-width: 64ch; }
+  @media (prefers-reduced-motion: reduce) { .s52__row, .s52__mbar { transition: none; } }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+
+  registerActivate('s5-2', (reduced) => {
+    const rows = Array.from(document.querySelectorAll('#s5-2 .s5-model-row'));
+    const bars = Array.from(document.querySelectorAll<HTMLElement>('#s5-2 .s5-bar'));
+    const fill = (bar: HTMLElement) => {
+      bar.style.width = `${bar.dataset.width}%`;
+    };
+    if (reduced) {
+      for (const el of rows) el.classList.add('is-shown');
+      for (const b of bars) fill(b);
+      return;
+    }
+    rows.forEach((el, i) => window.setTimeout(() => el.classList.add('is-shown'), 120 + i * 150));
+    bars.forEach((b, i) => window.setTimeout(() => fill(b), 320 + i * 150));
+  });
+
+  // LIVE CONTROL — ported from presentation.js:1261.
+  const slider = document.getElementById('s52-slider') as HTMLInputElement | null;
+  const fixesEl = document.getElementById('s52-fixes');
+  const lowEl = document.getElementById('s52-low');
+  const highEl = document.getElementById('s52-high');
+  if (slider && fixesEl && lowEl && highEl) {
+    // Per-fix cost of the illustrative bug fix (~226k input / ~16.4k output):
+    // cheapest vs. priciest row above.
+    const COST_LOW = 0.1126; // DeepSeek V4 Pro
+    const COST_HIGH = 1.5403; // Claude Opus 4.8
+    slider.addEventListener('input', () => {
+      const n = Number(slider.value);
+      fixesEl.textContent = String(n);
+      lowEl.textContent = `$${Math.round(n * COST_LOW)}`;
+      highEl.textContent = `$${Math.round(n * COST_HIGH)}`;
+    });
+  }
+</script>

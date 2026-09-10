@@ -1,0 +1,69 @@
+---
+// S8.1 — RESTORED. This beat and S8.2 are COMMENTED OUT in the harvest
+// (coaching-content/ai-token-economy-101/index.html:3675–3833), so the live page
+// ships 16 beats, not the 18 its data attributes describe. They are restored
+// here deliberately: the closer is the payoff of the whole argument, and a
+// stress test that stops before the conclusion is not a faithful port.
+// Flagged on /findings.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Button from '../primitives/Button.astro';
+---
+
+<div class="s81">
+  <BeatHeader code="S8.1" section="Closer">
+    <h2 class="s81__h">Start <em>building the context.</em></h2>
+  </BeatHeader>
+
+  <p class="s81__lede">
+    The token economy rewards context above all else. A team operating with shared rules, clear
+    definitions, and structured memory scales effortlessly.
+  </p>
+
+  <div class="s81__gauge">
+    <p class="s81__glabel">/context capacity</p>
+    <div class="s81__track">
+      <div class="s81__fill" data-fill="78"></div>
+    </div>
+    <p class="s81__ends">
+      <span>Fragmented</span>
+      <span class="s81__pct"><span data-count-to="78">0</span>%</span>
+      <span>Cohesive</span>
+    </p>
+  </div>
+
+  <p class="s81__then">then</p>
+  <Button href="#sources" variant="solid">Book the Workshop</Button>
+</div>
+
+<style>
+  .s81__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s81__h em { font-style: normal; color: var(--k-solved); }
+  .s81__lede { margin-block: 1.25rem 2rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 60ch; }
+  .s81__gauge { max-width: 36rem; }
+  .s81__glabel { margin: 0 0 0.4rem; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--k-fg-subtle); }
+  .s81__track { height: 0.75rem; border-radius: var(--k-radius-pill); background: var(--k-border); overflow: hidden; }
+  .s81__fill { height: 100%; width: 0; border-radius: var(--k-radius-pill); background: linear-gradient(to right, var(--k-holding), var(--k-solved)); transition: width 1200ms ease-out; }
+  .s81__ends { display: flex; justify-content: space-between; align-items: baseline; margin: 0.4rem 0 0; font-size: var(--k-text-xs); color: var(--k-fg-subtle); }
+  .s81__pct { font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: var(--k-text-sm); color: var(--k-solved); }
+  .s81__then { margin-block: 2rem 0.75rem; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--k-fg-subtle); }
+  @media (prefers-reduced-motion: reduce) { .s81__fill { transition: none; } }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp } from '../format';
+  registerActivate('s8-1', (reduced) => {
+    const fill = document.querySelector<HTMLElement>('#s8-1 [data-fill]');
+    const pct = document.querySelector<HTMLElement>('#s8-1 [data-count-to]');
+    const apply = () => {
+      if (fill) fill.style.width = `${fill.dataset.fill}%`;
+    };
+    if (reduced) {
+      apply();
+      if (pct) pct.textContent = pct.dataset.countTo ?? '';
+      return;
+    }
+    window.setTimeout(apply, 200);
+    if (pct) countUp(pct, Number(pct.dataset.countTo), { duration: 1200 });
+  });
+</script>

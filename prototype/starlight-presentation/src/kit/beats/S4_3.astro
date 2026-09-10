@@ -1,0 +1,147 @@
+---
+// S4.3 — LIVE CONTROL 3 of 4: drag the context fill; the hallucination panel
+// lights up past ~50%. Both the activate sweep (300/1150/1900ms) and the
+// slider's 120ms transition override are ported from presentation.js.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+import Panel from '../primitives/Panel.astro';
+
+const SYMPTOMS = [
+  'misremembers the middle',
+  'contradicts earlier steps',
+  "invents files & APIs that don't exist",
+];
+const LEVERS = [
+  { t: 'Monitor · /context', b: "Watch the gauge before it degrades — catch it while it's still grounded." },
+  { t: 'Compact · handoff', b: 'Summarize where you are into a clean handoff, then start fresh from it.' },
+];
+---
+
+<div class="s43">
+  <BeatHeader code="S4.3" section="Managing Context">
+    <h2 class="s43__h">Past <em>~half full</em>, the model starts losing the plot.</h2>
+  </BeatHeader>
+
+  <p class="s43__lede">
+    Below that is the smart zone — grounded and reliable. Past it, quality degrades and the model
+    starts filling gaps with plausible fiction; measured degradation begins well before the
+    advertised window limit<Cite n={[3, 4]} />. So do two things: monitor with
+    <code>/context</code>, and compact via a handoff.
+  </p>
+
+  <div class="s43__gauge">
+    <div class="s43__zones" aria-hidden="true">
+      <span class="s43__zone s43__zone--safe">Smart zone · grounded</span>
+      <span class="s43__zone s43__zone--risk">Danger zone · hallucinates</span>
+    </div>
+    <div class="s43__track">
+      <div class="context-gauge-fill s43__fill"></div>
+      <span class="s43__threshold" aria-hidden="true"></span>
+    </div>
+    <p class="s43__tlabel">~50% · hallucination onset</p>
+
+    <div class="s43__crow">
+      <label for="s43-slider" class="s43__clabel">drag the fill</label>
+      <input id="s43-slider" type="range" min="0" max="100" value="85" class="s43__range" aria-label="Context window fullness" />
+      <span class="s43__cval"><span id="s43-pct">85</span>%</span>
+    </div>
+  </div>
+
+  <div class="s4-3-risk s43__risk">
+    <Panel tone="warn">
+      <p class="s43__rh">past ~50% — what "losing the plot" looks like</p>
+      <ul class="s43__symptoms">{SYMPTOMS.map((s) => <li>{s}</li>)}</ul>
+    </Panel>
+  </div>
+
+  <p class="s43__caveat">
+    ~illustrative threshold, not an exact number — but degradation well before the limit is
+    measured across frontier models<Cite n={[3, 4]} />
+  </p>
+
+  <div class="s43__levers">
+    {LEVERS.map((l) => (
+      <div class="s4-3-lever s43__lever">
+        <h3 class="s43__lt">{l.t}</h3>
+        <p class="s43__lb">{l.b}</p>
+      </div>
+    ))}
+  </div>
+
+  <p class="s43__next">→ and every step adds to the bill. Let's do the math.</p>
+</div>
+
+<style>
+  .s43__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s43__h em { font-style: normal; color: var(--k-holding); }
+  .s43__lede { margin-block: 1.25rem 1.5rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 64ch; }
+  .s43__gauge { max-width: 40rem; }
+  .s43__zones { display: flex; font-size: 0.65rem; font-family: var(--k-font-mono); text-transform: uppercase; letter-spacing: 0.1em; margin-block-end: 0.35rem; }
+  .s43__zone--safe { flex: 0 0 50%; color: var(--k-solved); }
+  .s43__zone--risk { flex: 1; color: var(--k-amplified); }
+  .s43__track { position: relative; height: 1.75rem; border-radius: var(--k-radius-sm); background: var(--k-border); overflow: hidden; }
+  .s43__fill { height: 100%; width: 0; background: linear-gradient(to right, var(--k-solved) 0%, var(--k-solved) 45%, var(--k-holding) 55%, var(--k-amplified) 100%); background-size: 40rem 100%; transition: width 1500ms ease-out; }
+  .s43__threshold { position: absolute; inset-block: 0; left: 50%; width: 2px; background: var(--k-fg); opacity: 0.6; }
+  .s43__tlabel { margin: 0.35rem 0 0; font-family: var(--k-font-mono); font-size: 0.65rem; color: var(--k-fg-subtle); }
+  .s43__crow { display: flex; align-items: center; gap: 0.75rem; margin-block-start: 1rem; }
+  .s43__clabel { flex-shrink: 0; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--k-fg-subtle); }
+  .s43__range { flex: 1; accent-color: var(--k-accent); }
+  .s43__cval { width: 3rem; text-align: end; font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; }
+  .s43__risk { margin-block-start: 1.5rem; max-width: 40rem; opacity: 0; translate: 0 1rem; transition: opacity 400ms, translate 400ms; }
+  .s43__risk.is-shown { opacity: 1; translate: 0 0; }
+  .s43__rh { margin: 0 0 0.4rem; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--k-warn-high); }
+  .s43__symptoms { margin: 0; padding-inline-start: 1.1rem; color: var(--k-fg-muted); }
+  .s43__caveat { margin-block-start: 0.75rem; font-size: var(--k-text-xs); color: var(--k-fg-subtle); max-width: 60ch; }
+  .s43__levers { display: grid; gap: 1rem; margin-block-start: 1.75rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+  .s4-3-lever { border-inline-start: 3px solid var(--k-accent); padding-inline-start: 0.85rem; opacity: 0; translate: 0 1rem; transition: opacity 400ms, translate 400ms; }
+  .s4-3-lever.is-shown { opacity: 1; translate: 0 0; }
+  .s43__lt { font-size: var(--k-text-lg); margin: 0 0 0.3rem; }
+  .s43__lb { margin: 0; font-size: var(--k-text-sm); color: var(--k-fg-muted); line-height: 1.6; }
+  .s43__next { margin-block-start: 1.75rem; font-weight: 600; color: var(--k-fg-muted); }
+  @media (prefers-reduced-motion: reduce) {
+    .s43__fill, .s43__risk, .s4-3-lever { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+
+  registerActivate('s4-3', (reduced) => {
+    const container = document.getElementById('s4-3');
+    if (!container) return;
+    const gauge = container.querySelector<HTMLElement>('.context-gauge-fill');
+    const risk = container.querySelector('.s4-3-risk');
+    const levers = container.querySelectorAll('.s4-3-lever');
+
+    if (reduced) {
+      if (gauge) gauge.style.width = '85%';
+      risk?.classList.add('is-shown');
+      for (const l of levers) l.classList.add('is-shown');
+      return;
+    }
+    // Needle sweeps past 50%, the panel lights up, levers follow.
+    window.setTimeout(() => {
+      if (gauge) gauge.style.width = '85%';
+    }, 300);
+    window.setTimeout(() => risk?.classList.add('is-shown'), 1150);
+    window.setTimeout(() => {
+      levers.forEach((l, i) => window.setTimeout(() => l.classList.add('is-shown'), i * 200));
+    }, 1900);
+  });
+
+  // LIVE CONTROL — ported from presentation.js:1238.
+  const slider = document.getElementById('s43-slider') as HTMLInputElement | null;
+  const pctEl = document.getElementById('s43-pct');
+  const gaugeEl = document.querySelector<HTMLElement>('#s4-3 .context-gauge-fill');
+  const riskEl = document.querySelector('#s4-3 .s4-3-risk');
+  if (slider && pctEl && gaugeEl) {
+    slider.addEventListener('input', () => {
+      // The activate sweep eases over 1.5s; dragging needs to feel direct.
+      gaugeEl.style.transitionDuration = '120ms';
+      const v = Number(slider.value);
+      pctEl.textContent = String(v);
+      gaugeEl.style.width = `${v}%`;
+      riskEl?.classList.toggle('is-shown', v > 50);
+    });
+  }
+</script>

@@ -1,0 +1,120 @@
+---
+// S7.1 — three levers, buckets rising then items sliding in. Ported from
+// presentation.js:s7-1 (which reveals via rAF after clearing inline styles).
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Cite from '../primitives/Cite.astro';
+
+interface Item {
+  name: string;
+  body: string;
+  /** Render the name in mono — it is a command, not a product name. */
+  code?: boolean;
+  /** Appends the prompt-caching citation. */
+  cite?: boolean;
+}
+const BUCKETS: Array<{ title: string; items: Item[] }> = [
+  {
+    title: 'Automated',
+    items: [
+      { name: 'Headroom', body: 'Compresses everything your AI agent reads — tool outputs, logs, RAG chunks, files, and conversation history — before it reaches the LLM. Same answers, fraction of the tokens.' },
+      { name: 'rtk', code: true, body: 'Filters and compresses command outputs before they reach your LLM context. Single Rust binary, 100+ supported commands, <10ms overhead.' },
+      { name: 'Intelligent Routing', body: 'Prism, RouteLLM, OpenRouter — dynamically route tasks to the most cost-efficient capable model per query.' },
+      { name: 'caveman', code: true, body: 'Enforces a highly compressed, telegraphic style for AI agent outputs, saving up to 75% on output tokens without losing accuracy.' },
+    ],
+  },
+  {
+    title: 'Agent Steering',
+    items: [
+      { name: 'Memory Files', body: 'Persist critical context across sessions using shared files like AGENTS.md, CLAUDE.md, and agent profiles.' },
+      { name: 'Skills', body: 'Provide specialized guides and operational instructions for specific tasks, separating domain knowledge from base behavior.' },
+    ],
+  },
+  {
+    title: 'Team Practices',
+    items: [
+      { name: "Edit, Don't Restart", body: 'Edit the prompt that went wrong and regenerate. Stacking "no, do this instead" on top keeps the failed exchange in context — re-billed on every following turn.' },
+      { name: 'Session Hygiene', body: "Start fresh sessions for new tasks instead of reusing bloated mega-threads — and don't leave a session idle mid-task: prompt caches expire within minutes, so coming back pays the full cold re-read.", cite: true },
+      { name: 'Match Billing to the Work', body: "Flat-rate plans for open-ended, exploratory work; pay-per-token for well-scoped tasks. Don't pay by the token to wander." },
+      { name: 'Use CLI', body: 'Work directly in the terminal for transparent token tracking and leaner context reuse.' },
+      { name: 'Workflow', body: 'Structure how the agent operates — explicit planning passes, feedback loops, and verification steps before execution.' },
+    ],
+  },
+];
+---
+
+<div class="s71" data-viz="s7-1">
+  <BeatHeader code="S7.1" section="Tools &amp; Tips">
+    <h2 class="s71__h">Three levers to improve your token economy</h2>
+  </BeatHeader>
+
+  <p class="s71__lede">Some basic practical things you can try out today and grow into a habit.</p>
+
+  <div class="s71__buckets">
+    {
+      BUCKETS.map((b) => (
+        <div class="s7-bucket s71__bucket">
+          <h3 class="s71__bt">{b.title}</h3>
+          <ul class="s71__items">
+            {b.items.map((it) => (
+              <li class="s7-item s71__item">
+                <span class="s71__iname" data-code={it.code ? '' : undefined}>{it.name}</span>
+                <span class="s71__ibody">
+                  {it.body}
+                  {it.cite && <Cite n={7} />}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .s71__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s71__lede { margin-block: 1.25rem 1.75rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 60ch; }
+  .s71__buckets { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); align-items: start; }
+  .s7-bucket { border-block-start: 2px solid var(--k-accent); padding-block-start: 0.85rem; opacity: 0; translate: 0 2rem; transition: opacity 500ms ease-out, translate 500ms ease-out; }
+  .s7-bucket:nth-child(2) { transition-delay: 120ms; }
+  .s7-bucket:nth-child(3) { transition-delay: 240ms; }
+  .s7-bucket.is-shown { opacity: 1; translate: 0 0; }
+  .s71__bt { font-size: var(--k-text-lg); margin: 0 0 0.75rem; }
+  .s71__items { margin: 0; padding: 0; list-style: none; }
+  .s7-item { border-block-start: 1px solid var(--k-border); padding-block: 0.6rem; opacity: 0; translate: 1rem 0; transition: opacity 400ms ease-out, translate 400ms ease-out; }
+  .s7-item:nth-child(2) { transition-delay: 80ms; }
+  .s7-item:nth-child(3) { transition-delay: 160ms; }
+  .s7-item:nth-child(4) { transition-delay: 240ms; }
+  .s7-item:nth-child(5) { transition-delay: 320ms; }
+  .s7-item.is-shown { opacity: 1; translate: 0 0; }
+  .s71__iname { display: block; font-weight: 600; color: var(--k-accent-high); }
+  .s71__iname[data-code] { font-family: var(--k-font-mono); }
+  .s71__ibody { font-size: var(--k-text-sm); line-height: 1.6; color: var(--k-fg-muted); }
+  @media (prefers-reduced-motion: reduce) {
+    .s7-bucket, .s7-item { transition: none; transition-delay: 0ms !important; }
+  }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  registerActivate('s7-1', (reduced) => {
+    const viz = document.querySelector('[data-viz="s7-1"]');
+    if (!viz) return;
+    const buckets = viz.querySelectorAll<HTMLElement>('.s7-bucket');
+    const items = viz.querySelectorAll<HTMLElement>('.s7-item');
+
+    if (reduced) {
+      for (const el of [...buckets, ...items]) {
+        el.style.transition = 'none';
+        el.style.transitionDelay = '0ms';
+        el.classList.add('is-shown');
+      }
+      return;
+    }
+    // Let the browser apply the base styles before flipping the class, or the
+    // transition is skipped entirely.
+    requestAnimationFrame(() => {
+      for (const el of [...buckets, ...items]) el.classList.add('is-shown');
+    });
+  });
+</script>

@@ -1,0 +1,63 @@
+---
+// S8.2 — RESTORED alongside S8.1; see the note there. This is the talk's thesis,
+// and it is the one beat the harvest's own `data-assertion` calls the closer.
+import BeatHeader from '../primitives/BeatHeader.astro';
+import Panel from '../primitives/Panel.astro';
+
+const UNMANAGED = ['Bills by the word', 'Never asks questions', 'Dumber under load'];
+---
+
+<div class="s82">
+  <BeatHeader code="S8.2" section="Closer">
+    <h2 class="s82__h">Lead your people to <em>lead the AI.</em></h2>
+  </BeatHeader>
+
+  <p class="s82__lede">
+    The freelancer you hired isn't going away. They bill by the word and they get dumber under
+    load. But the gap between their baseline output and a curated result is where your leverage
+    lies.
+  </p>
+
+  <div class="s82__cols">
+    <Panel>
+      <h3 class="s82__ch">The Unmanaged AI</h3>
+      <ul class="s82__list">{UNMANAGED.map((u) => <li>{u}</li>)}</ul>
+    </Panel>
+    <Panel>
+      <h3 class="s82__ch">The Upskilling Gap</h3>
+      <p class="s82__mult"><span data-count-to="10">0</span>×</p>
+      <p class="s82__mlabel">Outcome per Euro</p>
+      <p class="s82__cb">
+        Your cost is fixed. The quality multiplier depends entirely on the system you build around
+        it.
+      </p>
+    </Panel>
+  </div>
+
+  <p class="s82__thesis">
+    The winner isn't who spends the most on AI, or who refuses it — it's whoever's teaching their
+    people to use it economically.
+  </p>
+</div>
+
+<style>
+  .s82__h { font-size: clamp(1.5rem, 3.2vw, var(--k-text-3xl)); font-weight: 800; line-height: 1.2; margin: 0; }
+  .s82__h em { font-style: normal; color: var(--k-accent-high); }
+  .s82__lede { margin-block: 1.25rem 2rem; color: var(--k-fg-muted); line-height: 1.7; max-width: 62ch; }
+  .s82__cols { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+  .s82__ch { font-size: var(--k-text-lg); margin: 0 0 0.6rem; }
+  .s82__list { margin: 0; padding-inline-start: 1.1rem; color: var(--k-fg-muted); line-height: 1.7; }
+  .s82__mult { margin: 0; font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; font-size: var(--k-text-4xl); font-weight: 800; color: var(--k-solved); line-height: 1; }
+  .s82__mlabel { margin: 0.2rem 0 0.75rem; font-family: var(--k-font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--k-fg-subtle); }
+  .s82__cb { margin: 0; font-size: var(--k-text-sm); line-height: 1.6; color: var(--k-fg-muted); }
+  .s82__thesis { margin-block-start: 2rem; border-inline-start: 4px solid var(--k-accent); padding: 0.6rem 0 0.6rem 1rem; font-size: var(--k-text-xl); font-weight: 700; line-height: 1.45; }
+</style>
+
+<script>
+  import { registerActivate } from '../tower/engine';
+  import { countUp } from '../format';
+  registerActivate('s8-2', (reduced) => {
+    const el = document.querySelector<HTMLElement>('#s8-2 [data-count-to]');
+    if (el) countUp(el, Number(el.dataset.countTo), { reduceMotion: reduced, duration: 1000 });
+  });
+</script>

@@ -1,0 +1,544 @@
+---
+// THE SCORECARD — this prototype's actual deliverable.
+//
+// Rendered as a page rather than buried in a README, per the prototype skill's
+// "surface the state" rule. Every number here was measured from the build in
+// this repo, not estimated. The VERDICT section is deliberately left blank —
+// that call is Han's.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Chip from '../kit/primitives/Chip.astro';
+import Panel from '../kit/primitives/Panel.astro';
+import StackBar from '../components/StackBar.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// docs/research/design-references.md:140–163
+const BAR: Array<{ n: number; item: string; sl: string; bare: string; note: string }> = [
+  { n: 1, item: 'Typographic hierarchy', sl: 'tie', bare: 'tie', note: 'The kit owns type scale on both sides.' },
+  { n: 2, item: 'Consistent spacing rhythm', sl: 'tie', bare: 'tie', note: 'Kit tokens; neither stack contributes.' },
+  { n: 3, item: 'Restrained colour palette', sl: 'starlight', bare: '', note: 'Starlight supplies a tested light+dark ramp. The bare side needed 101 hand-authored lines, and the verdict ramp had to be re-tuned for light mode or badges failed contrast.' },
+  { n: 4, item: 'Readable measure', sl: 'tie', bare: 'tie', note: '--k-measure maps from --sl-content-width on one side, literal 45rem on the other.' },
+  { n: 5, item: 'Code presentation', sl: 'starlight', bare: '', note: 'astro-expressive-code ships free (ec.w36nc.css, 30 --sl-* refs). The bare tree has no highlighter at all — this page and the tower only get away with it because neither shows real code blocks.' },
+  { n: 6, item: 'Responsive at every width', sl: 'tie', bare: 'tie', note: 'Kit primitives are all intrinsic/auto-fit.' },
+  { n: 7, item: 'Flicker-free dark mode', sl: 'starlight', bare: '', note: 'THE decisive one. Starlight ships a blocking inline FOUC guard plus a synced <ThemeSelect>. The bare tree needed a hand-written inline guard AND a toggle; get the inline part wrong and every load flashes.' },
+  { n: 8, item: 'Meaningful motion', sl: 'tie', bare: 'tie', note: 'The ported engine gates every path on prefers-reduced-motion. Stack-neutral.' },
+  { n: 9, item: 'Accessible navigation', sl: 'starlight', bare: '', note: 'Skip link, landmarks, focus management, mobile nav — all free. The bare shell hand-rolls a skip link and stops there.' },
+  { n: 10, item: 'Fast first paint', sl: '', bare: 'bare', note: 'Bare ships 71.5 KB of assets vs 141.7 KB — Starlight adds ~70 KB, almost all of it middleware.css (65 KB), most of which these pages never use.' },
+  { n: 11, item: 'Wayfinding + search', sl: 'starlight', bare: '', note: 'Pagefind builds a 708 KB index and a working ⌘K dialog for free. Replacing it is a project, not a file.' },
+  { n: 12, item: 'Trustworthy detail', sl: 'tie', bare: 'tie', note: 'Sources, citations and provenance are content, which the kit owns.' },
+];
+
+const DISABLED = [
+  { route: '/', off: ["template: 'splash'", 'tableOfContents: false', 'hasSidebar: false'] },
+  { route: '/talk', off: ["template: 'splash'", 'tableOfContents: false', 'hasSidebar: false', 'pagefind: false'] },
+  { route: '/token-101', off: ["template: 'splash'", 'tableOfContents: false', 'hasSidebar: false'] },
+];
+
+const FORGONE = [
+  { f: 'Pagefind search', cost: 'high', note: '708 KB index + ⌘K dialog, generated from the build. No bare equivalent written.' },
+  { f: 'astro-expressive-code', cost: 'high', note: 'Syntax highlighting with themes. Not replaced; no page here needed it, which is luck not design.' },
+  { f: 'Light/dark + FOUC guard', cost: 'medium', note: 'Replaced by hand: ~14 lines inline guard + ~10 lines toggle in BareLayout.' },
+  { f: 'Document shell & <head>', cost: 'medium', note: 'BareLayout.astro is 161 lines, all of it things Starlight supplied.' },
+  { f: 'Colour system', cost: 'medium', note: 'kit/tokens.css — 101 lines of literals. The Starlight adapter that replaces it is 49.' },
+  { f: 'remark directives (:::note)', cost: 'low', note: 'Not used by either module; the kit has <Panel> and <Aside> instead.' },
+  { f: 'i18n routing', cost: 'low', note: 'Unused here. Genuinely non-trivial to re-add if it is ever wanted (issue #6).' },
+  { f: 'Sitemap', cost: 'trivial', note: 'One integration; @astrojs/sitemap works without Starlight.' },
+  { f: 'Link prefetching', cost: 'trivial', note: 'Starlight turns it on project-wide (dist/index.js:94). One config line to re-add.' },
+];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Findings — Astro + Starlight, or not?',
+    description:
+      'The scorecard from prototype 2: one hub and two learning modules rendered on two stacks, sharing one kit.',
+    template: 'splash',
+    tableOfContents: false,
+  }}
+  hasSidebar={false}
+>
+  <div class="pfull fnd">
+    <StackBar route="findings" stack="starlight" />
+
+    <header class="fnd__head">
+      <p class="fnd__eyebrow">Prototype 2 · scorecard</p>
+      <h1 class="fnd__h1">Do we stick with Astro + Starlight?</h1>
+      <p class="fnd__lede">
+        One hub and two learning modules, each rendered twice from one shared kit — once on
+        Starlight (<code>/</code>, <code>/talk</code>, <code>/token-101</code>) and once on plain
+        Astro (<code>/bare/*</code>). The kit is the controlled variable: it consumes only
+        <code>--k-*</code> and never learns which stack it is on.
+      </p>
+      <p class="fnd__lede">
+        This may reopen <strong>#4</strong> (which locked Astro + Starlight) and feeds
+        <strong>#5</strong> (folder architecture) and <strong>#6</strong> (i18n/theme). It does not
+        start <strong>#7</strong>.
+      </p>
+    </header>
+
+    <section class="fnd__s">
+      <h2>0 · Did the experiment hold?</h2>
+      <Panel tone="raised">
+        <p class="fnd__p">
+          <strong>Yes, verified rather than assumed.</strong> Starlight ships
+          <strong>no <code>injectScript</code></strong>; its CSS arrives via
+          <code>virtual:starlight/user-css</code>, imported by its own <code>Page.astro</code>. A
+          route that never imports Starlight gets no Starlight CSS and no <code>customCss</code>
+          either. <code>scripts/verify-isolation.mjs</code> asserts this on every build: the bare
+          tree loads zero bundles containing <code>--sl-*</code>, and — the check that actually
+          matters — is still <em>styled</em>, because a page with no <code>--k-*</code> is broken,
+          not clean.
+        </p>
+        <p class="fnd__p">
+          One thing does cross: Astro's own <strong>2.5 KB prefetch module</strong>, which Starlight
+          enables project-wide at <code>dist/index.js:94</code>. Zero Starlight code in it.
+        </p>
+      </Panel>
+    </section>
+
+    <section class="fnd__s">
+      <h2>1 · Starlight features disabled, per page</h2>
+      <p class="fnd__p">
+        Every Starlight route in this prototype turns off most of Starlight. That is the finding.
+      </p>
+      <ul class="fnd__disabled">
+        {
+          DISABLED.map((d) => (
+            <li>
+              <code>{d.route}</code>
+              <span class="fnd__count">{d.off.length} off</span>
+              <span class="fnd__offs">{d.off.map((o) => <Chip>{o}</Chip>)}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="fnd__p fnd__p--tight">
+        What is left of Starlight on these pages: the header, the search dialog, the theme toggle,
+        the colour tokens and the document shell. Real value — but a fraction of what it is for.
+        The one page that uses Starlight <em>as intended</em> is the control page
+        (<a href={`${base}/2026-09-15-maintaining-high-value-knowledge-bases/`}>the governed
+        markdown, rendered as-is</a>), which needed no design work at all.
+      </p>
+    </section>
+
+    <section class="fnd__s">
+      <h2>2 · Cost of dropping Starlight, measured</h2>
+      <table class="fnd__t">
+        <thead><tr><th>Feature forgone</th><th>Cost to replace</th><th>What actually happened</th></tr></thead>
+        <tbody>
+          {
+            FORGONE.map((f) => (
+              <tr>
+                <td>{f.f}</td>
+                <td><span class="fnd__cost" data-cost={f.cost}>{f.cost}</span></td>
+                <td>{f.note}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="fnd__p fnd__p--tight">
+        Bare tree ships <strong>71.5 KB</strong> of assets against Starlight's
+        <strong>141.7 KB</strong> for the same page. Nearly all of that ~70 KB delta is
+        <code>middleware.css</code> (65 KB) — Starlight's full stylesheet, shipped whole even
+        though <code>splash</code> pages use a slice of it.
+      </p>
+    </section>
+
+    <section class="fnd__s">
+      <h2>3 · The 12-criterion quality bar</h2>
+      <p class="fnd__p">
+        Scored against <code>docs/research/design-references.md:140–163</code> — the same bar #4
+        leaned on. <strong>Six ties, five to Starlight, one to bare.</strong> The ties are all
+        criteria the <em>kit</em> owns, which is the point: most of what makes these pages good is
+        not the framework.
+      </p>
+      <ol class="fnd__bar">
+        {
+          BAR.map((b) => (
+            <li>
+              <div class="fnd__barhead">
+                <span class="fnd__barn">{String(b.n).padStart(2, '0')}</span>
+                <span class="fnd__baritem">{b.item}</span>
+                <span class="fnd__win" data-win={b.sl || b.bare}>
+                  {b.sl === 'tie' ? 'tie — kit owns it' : b.sl ? 'Starlight' : 'plain Astro'}
+                </span>
+              </div>
+              <p class="fnd__barnote">{b.note}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="fnd__s">
+      <h2>4 · Top-nav verdict — did #4's claim survive?</h2>
+      <Panel tone="raised">
+        <p class="fnd__p"><strong>Half.</strong></p>
+        <p class="fnd__p">
+          #4 said a hub "gets a custom look via <code>template: splash</code> + <code>hero</code> +
+          overrides", with <code>src/pages/*.astro</code> as a last-resort escape hatch, and
+          <code>starlight-and-stack.md:32</code> warned that <code>PageFrame</code> overrides are
+          "significant complexity".
+        </p>
+        <p class="fnd__p">
+          <strong>Survived:</strong> we never wrote a single component override. No
+          <code>Header</code>, no <code>PageFrame</code>, no <code>components:</code> key in
+          <code>astro.config.mjs</code> at all. <code>template: 'splash'</code> alone gave a
+          chrome-free canvas while keeping the header, search and theme toggle. The predicted
+          complexity never materialised.
+        </p>
+        <p class="fnd__p">
+          <strong>Did not survive:</strong> <code>hero</code> went unused. The harvested hub is an
+          editorial single column — eyebrow, typographic headline, an ambient meter, a featured row,
+          two disabled placeholders — and Starlight's <code>hero</code> shape (title / tagline /
+          image / actions) cannot express it. So the hub is a <code>&lt;StarlightPage&gt;</code>
+          wrapping a fully hand-built <code>&lt;Hub&gt;</code>. Starlight contributed the shell and
+          nothing above it.
+        </p>
+        <p class="fnd__p">
+          Also worth recording: <strong>every one of the six pages went straight to
+          <code>src/pages/*.astro</code></strong>. The "last resort" is the only resort once a page
+          is not a document.
+        </p>
+      </Panel>
+    </section>
+
+    <section class="fnd__s">
+      <h2>5 · Interactivity verdict</h2>
+      <Panel tone="raised">
+        <p class="fnd__p">
+          #4 claimed <em>"only heavy bespoke interactivity would force plain Astro, and the skeleton
+          has none."</em> The premise changed: module 2 is 1287 lines of bespoke interaction JS.
+        </p>
+        <p class="fnd__p">
+          <strong>It ported cleanly, and Starlight barely noticed.</strong> All 18 beats, all 16
+          one-shot activate animations and all 4 live controls run identically on both trees from
+          one engine. Starlight's markdown-centric model did not fight them — because none of this
+          went through markdown. It is <code>.astro</code> components with component
+          <code>&lt;script&gt;</code> blocks, which Astro bundles the same way with or without
+          Starlight.
+        </p>
+        <p class="fnd__p">
+          Three real frictions, none fatal:
+        </p>
+        <ul class="fnd__ul">
+          <li>
+            <strong>Scoped CSS vs imperative DOM.</strong> The tokenizer playground and the
+            <code>/context</code> grid <em>create</em> elements at runtime, so Astro's scope hash
+            never reaches them and their styles had to be <code>:global()</code>. The harvest never
+            hit this because its chips carried Tailwind utility classes, which are global by
+            nature. Astro's component model taxes imperative DOM.
+          </li>
+          <li>
+            <strong>Scroll ownership.</strong> The harvest's <code>#tower</code> was an
+            <code>overflow-y-auto</code> element owning the viewport, which is what made
+            <code>scroll-snap</code> and <code>IntersectionObserver root</code> work. Starlight owns
+            page scroll, so the engine had to make the scroll root optional and snap became a prop:
+            on <code>/bare/token-101</code> and off on <code>/token-101</code>. Same engine, one
+            genuinely degraded feature.
+          </li>
+          <li>
+            <strong>Theme attribute collision.</strong> The harvest set <code>data-theme</code> on
+            <code>&lt;html&gt;</code> across 35 daisyUI themes. Starlight owns that exact attribute.
+            They cannot both have it — this alone forced the daisyUI drop.
+          </li>
+        </ul>
+      </Panel>
+    </section>
+
+    <section class="fnd__s">
+      <h2>6 · Migration cost, and what prototype 1 was hiding</h2>
+      <p class="fnd__p">
+        Dropping daisyUI cost a mechanical rewrite: <code>badge</code> ×91, <code>card</code> ×45,
+        <code>tooltip</code> ×42, <code>btn</code> ×14 became <code>&lt;Chip&gt;</code>,
+        <code>&lt;Panel&gt;</code>, <code>&lt;Tip&gt;</code>, <code>&lt;Button&gt;</code>. The only
+        harvested CSS that survived untouched is <code>animation.css</code> (513 lines, beat S2.1) —
+        it is all <code>currentColor</code> and <code>color-mix</code>, so it never knew about
+        daisyUI in the first place. <strong>Theme-agnostic CSS is portable CSS.</strong>
+      </p>
+      <p class="fnd__p">
+        The sharper finding is about <em>our own</em> code. Prototype 1's variants looked
+        stack-agnostic and were not — coupled to Starlight in two independent ways, neither visible
+        in the page HTML, both found only by building <code>/bare/talk</code> and diffing bundles:
+      </p>
+      <ol class="fnd__ul">
+        <li>
+          <strong>Tokens.</strong> All three variants referenced <code>--sl-*</code> directly (39 /
+          37 / 29 call sites; 105 refs in the emitted CSS). Migrated to <code>--k-*</code>.
+        </li>
+        <li>
+          <strong>Delivery.</strong> <code>prototype.css</code> shipped only through Starlight's
+          <code>customCss</code>, so the bare tree rendered the switcher, banner, chips and verdict
+          badges with <em>no styles at all</em>. Split into <code>styles/chrome.css</code> (both
+          trees) and <code>styles/starlight-only.css</code>.
+        </li>
+      </ol>
+      <p class="fnd__p fnd__p--tight">
+        Lesson that outlives this prototype: <strong>"is this portable?" is not answerable by
+        reading.</strong> Both couplings hid in external bundles. Hence the build-time check.
+      </p>
+      <p class="fnd__p">
+        The token layer itself is the cheap part, and the asymmetry is the useful number:
+        <strong>101 lines</strong> of literal values for the bare baseline versus
+        <strong>49 lines</strong> for the Starlight adapter. #4's phrasing was "Radix steps
+        <em>become</em> the <code>--sl-color-*</code> tokens"; inverted — the kit owning a contract
+        that Starlight <em>feeds</em> — it held up, and it is what made a two-tree comparison
+        possible at all.
+      </p>
+    </section>
+
+    <section class="fnd__s">
+      <h2>7 · Does one content shape hold both modules?</h2>
+      <Panel tone="raised">
+        <p class="fnd__p">
+          <strong>Only because it refuses to model the body.</strong>
+          <code>LearningModule</code> holds slug, kind, title, description, blurb, duration, status,
+          sources and origin — and stops. Module 1 is a timed talk script loaded from governed
+          markdown; module 2 is 18 hand-authored beats. <code>kind</code> discriminates and each
+          renderer owns its own content type.
+        </p>
+        <p class="fnd__p">
+          That is enough for the hub, which only needs the metadata. It would <em>not</em> survive
+          "list every section across all modules" or "search within a module". Forcing a shared body
+          type is exactly where <code>talk.ts:8</code> said the real feature begins, and this
+          prototype deliberately did not start it. Relevant to <strong>#5</strong>.
+        </p>
+        <p class="fnd__p">
+          One asymmetry worth noting: module 1 loads from
+          <code>../../docs/presentations</code> via a content collection with
+          <strong>every OKF field <code>.optional()</code></strong>, because
+          <code>&lt;StarlightPage&gt;</code> validates its own frontmatter against the same schema —
+          a required <code>type: 'presentation'</code> breaks every custom page. The bare tree needs
+          no content collection at all. Whether that is liberating or a loss is a real question:
+          content collections are Astro, not Starlight, so this is the one place where dropping
+          Starlight changes nothing and dropping <em>Astro</em> would change everything.
+        </p>
+      </Panel>
+    </section>
+
+    <section class="fnd__s">
+      <h2>8 · Fidelity notes — where this port is not the harvest</h2>
+      <ul class="fnd__ul">
+        <li>
+          <strong>S8.1 and S8.2 are restored.</strong> Both are commented out in
+          <code>coaching-content/ai-token-economy-101/index.html:3675–3833</code>, so the live
+          harvested page ships <strong>16</strong> beats, not the 18 its own data attributes
+          describe. They are restored here because the closer is the payoff of the argument.
+        </li>
+        <li>
+          <strong>The TOC is server-rendered.</strong> The harvest injected it as an
+          <code>innerHTML</code> string, so it did not exist without JS and Pagefind never saw it.
+          Here it comes from <code>kit/tower/beats.ts</code>.
+        </li>
+        <li>
+          <strong>Reveal-on-enter is progressive.</strong> The harvest shipped
+          <code>opacity-0</code> in the markup, so with JS off the whole page was blank. Beats now
+          start visible and only hide once the engine marks the tower as JS-driven.
+        </li>
+        <li>
+          <strong>The 35-theme picker is gone</strong> — the <code>data-theme</code> collision.
+        </li>
+        <li>
+          <strong>Two duplicate rAF loops became one.</strong> The ambient meter was duplicated
+          verbatim across both harvested pages (same seed <code>1472318</code>, same
+          <code>×3.2</code> rate); one loop now drives every instance so they cannot drift.
+        </li>
+        <li>
+          <strong>A third harvested page was left out</strong> — <code>loop-engineering-101</code>
+          exists in that repo and is listed here as a deliberate coming-soon placeholder.
+        </li>
+      </ul>
+    </section>
+
+    <section class="fnd__s fnd__s--verdict">
+      <h2>Verdict</h2>
+      <Panel tone="warn">
+        <p class="fnd__p fnd__p--blank">
+          Left blank deliberately — the call is Han's. Walk both trees, then write it here.
+        </p>
+        <p class="fnd__p">
+          <a href={`${base}/`}>Starlight hub</a> · <a href={`${base}/bare/`}>bare hub</a> ·
+          <a href={`${base}/token-101`}>Starlight tower</a> ·
+          <a href={`${base}/bare/token-101`}>bare tower</a> ·
+          <a href={`${base}/talk`}>Starlight talk</a> · <a href={`${base}/bare/talk`}>bare talk</a>
+        </p>
+      </Panel>
+    </section>
+  </div>
+</StarlightPage>
+
+<style>
+  .fnd {
+    max-width: 58rem;
+    margin-inline: auto;
+    padding-block-end: 5rem;
+  }
+  .fnd__head {
+    padding-block: 2rem 1rem;
+  }
+  .fnd__eyebrow {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--k-fg-subtle);
+    margin: 0;
+  }
+  .fnd__h1 {
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0.75rem 0 0;
+  }
+  .fnd__lede {
+    color: var(--k-fg-muted);
+    line-height: 1.7;
+    max-width: 64ch;
+  }
+  .fnd__s {
+    margin-block-start: 3rem;
+  }
+  .fnd__s h2 {
+    font-size: var(--k-text-2xl);
+    border-block-end: 1px solid var(--k-border);
+    padding-block-end: 0.4rem;
+    margin-block-end: 1rem;
+  }
+  .fnd__p {
+    line-height: 1.75;
+    color: var(--k-fg-muted);
+  }
+  .fnd__p--tight {
+    margin-block-end: 0;
+  }
+  .fnd__p--blank {
+    min-height: 4rem;
+    font-style: italic;
+    color: var(--k-fg-subtle);
+  }
+  .fnd__ul {
+    line-height: 1.7;
+    color: var(--k-fg-muted);
+  }
+  .fnd__ul li {
+    margin-block: 0.6rem;
+  }
+  .fnd__disabled {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fnd__disabled li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    border-block-start: 1px solid var(--k-border);
+    padding-block: 0.6rem;
+  }
+  .fnd__disabled code {
+    font-weight: 700;
+    min-width: 8rem;
+  }
+  .fnd__count {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-amplified);
+    min-width: 4rem;
+  }
+  .fnd__offs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .fnd__t {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--k-text-sm);
+  }
+  .fnd__t th {
+    text-align: start;
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--k-fg-subtle);
+    border-block-end: 1px solid var(--k-border);
+    padding: 0.4rem 0.5rem;
+  }
+  .fnd__t td {
+    border-block-end: 1px solid var(--k-border);
+    padding: 0.5rem;
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--k-fg-muted);
+  }
+  .fnd__cost {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .fnd__cost[data-cost='high'] {
+    color: var(--k-amplified);
+  }
+  .fnd__cost[data-cost='medium'] {
+    color: var(--k-holding);
+  }
+  .fnd__cost[data-cost='low'] {
+    color: var(--k-split);
+  }
+  .fnd__cost[data-cost='trivial'] {
+    color: var(--k-solved);
+  }
+  .fnd__bar {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fnd__bar li {
+    border-block-start: 1px solid var(--k-border);
+    padding-block: 0.75rem;
+  }
+  .fnd__barhead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .fnd__barn {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    color: var(--k-fg-subtle);
+  }
+  .fnd__baritem {
+    font-weight: 700;
+    flex: 1;
+  }
+  .fnd__win {
+    font-family: var(--k-font-mono);
+    font-size: var(--k-text-xs);
+    border: 1px solid currentcolor;
+    border-radius: var(--k-radius-pill);
+    padding: 0.05rem 0.5rem;
+  }
+  .fnd__win[data-win='starlight'] {
+    color: var(--k-accent-high);
+  }
+  .fnd__win[data-win='bare'] {
+    color: var(--k-warn);
+  }
+  .fnd__win[data-win='tie'] {
+    color: var(--k-fg-subtle);
+  }
+  .fnd__barnote {
+    margin: 0.35rem 0 0;
+    font-size: var(--k-text-sm);
+    line-height: 1.6;
+    color: var(--k-fg-subtle);
+  }
+  .fnd__s--verdict h2 {
+    border-block-end-color: var(--k-warn);
+  }
+</style>

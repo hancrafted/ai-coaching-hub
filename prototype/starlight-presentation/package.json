@@ -2,7 +2,7 @@
   "name": "starlight-presentation-prototype",
   "private": true,
   "type": "module",
-  "//": "THROWAWAY PROTOTYPE 2 \u2014 see prototype/starlight-presentation/README.md",
+  "//": "THROWAWAY PROTOTYPE 2 — see prototype/starlight-presentation/README.md",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/verify-isolation.mjs",
@@ -15,5 +15,9 @@
     "@astrojs/starlight": "0.42.0",
     "astro": "7.3.2",
     "mermaid": "11.17.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
   }
 }

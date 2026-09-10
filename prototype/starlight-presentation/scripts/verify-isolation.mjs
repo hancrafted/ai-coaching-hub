@@ -18,8 +18,30 @@ const STARLIGHT = ['index.html', 'talk/index.html', 'token-101/index.html'];
 const fail = [];
 const ok = [];
 
-const cssOf = (html) =>
-  [...html.matchAll(/href="([^"]*\.css)"/g)].map((m) => m[1].replace(/^\/+/, ''));
+// Asset URLs carry the configured base (`/ai-coaching-hub/...`) in a Pages
+// build and no base at the root. The base is DERIVED from the emitted HTML
+// rather than read from PROTOTYPE_BASE, because in `VAR=x astro build && node
+// ...` the assignment applies only to the first command — so the env var is
+// absent here. Getting this wrong made every lookup miss and the script report
+// "no CSS at all": a false NEGATIVE that would have hidden real contamination.
+const cssOf = (html) => [...html.matchAll(/href="([^"]*\.css)"/g)].map((m) => m[1]);
+
+const detectBase = () => {
+  for (const page of [...STARLIGHT, ...BARE]) {
+    const p = join(DIST, page);
+    if (!existsSync(p)) continue;
+    const m = readFileSync(p, 'utf8').match(/href="(\/[^"]*?)\/?_astro\//);
+    if (m) return m[1].replace(/^\/|\/$/g, '');
+  }
+  return '';
+};
+const BASE = detectBase();
+
+const toDistPath = (url) => {
+  let u = url.replace(/^\/+/, '');
+  if (BASE && (u === BASE || u.startsWith(`${BASE}/`))) u = u.slice(BASE.length + 1);
+  return join(DIST, u);
+};
 
 if (!existsSync(DIST)) {
   console.error('dist/ missing — run `npm run build` first.');
@@ -43,9 +65,14 @@ for (const page of BARE) {
   if (/data-pagefind|starlight-route/.test(html))
     fail.push(`${page}: carries Starlight runtime markers`);
 
-  for (const css of cssOf(html)) {
-    const cp = join(DIST, css);
-    if (!existsSync(cp)) continue;
+  const sheets = cssOf(html);
+  if (sheets.length === 0) fail.push(`${page}: loads no stylesheet at all`);
+  for (const css of sheets) {
+    const cp = toDistPath(css);
+    if (!existsSync(cp)) {
+      fail.push(`${page}: stylesheet ${css} did not resolve under ${DIST}/`);
+      continue;
+    }
     const body = readFileSync(cp, 'utf8');
     const slRefs = (body.match(/--sl-/g) ?? []).length;
     if (slRefs > 0) fail.push(`${page}: loads ${css} which has ${slRefs} --sl-* refs`);
@@ -54,7 +81,7 @@ for (const page of BARE) {
   // The bare tree must still be styled — a page with no --k-* is not "clean",
   // it is broken. This is the check that would have caught the missing chrome.
   const kitRefs = cssOf(html)
-    .map((c) => join(DIST, c))
+    .map(toDistPath)
     .filter(existsSync)
     .reduce((n, c) => n + (readFileSync(c, 'utf8').match(/--k-/g) ?? []).length, 0);
   if (kitRefs === 0) fail.push(`${page}: loads no CSS using the kit contract (--k-*)`);
@@ -71,13 +98,14 @@ for (const page of STARLIGHT) {
   }
   const html = readFileSync(p, 'utf8');
   const hasSl = cssOf(html)
-    .map((c) => join(DIST, c))
+    .map(toDistPath)
     .filter(existsSync)
     .some((c) => readFileSync(c, 'utf8').includes('--sl-'));
   if (!hasSl) fail.push(`${page}: no Starlight CSS — control tree is not actually Starlight`);
   else ok.push(`${page}: Starlight present, as expected`);
 }
 
+console.log(`  base: ${BASE === '' ? '(root)' : `/${BASE}`}`);
 for (const line of ok) console.log(`  ok   ${line}`);
 for (const line of fail) console.log(`  FAIL ${line}`);
 console.log(
